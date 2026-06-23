@@ -2,37 +2,81 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Nueva Solicitud - TechCare.mza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nueva Solicitud — TechCare.mza</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <nav class="navbar">
     <a href="/" class="logo">TechCare<span>.mza</span></a>
     <div class="nav-links">
-      <a href="/client/dashboard" class="btn btn-secondary">Volver</a>
+      <a href="/client/dashboard" class="btn btn-secondary btn-sm">← Volver</a>
     </div>
   </nav>
 
   <div class="container">
-    <div class="glass-card" style="max-width: 600px; margin: 0 auto; width: 100%;">
-      <h2 style="margin-bottom: 1.5rem;">Solicitar Reparación</h2>
-      <form action="/client/request/new" method="POST">
+    <div class="glass-card fade-up" style="max-width:640px; margin:0 auto; width:100%;">
+      <h2 style="font-size:1.6rem; font-weight:800; margin-bottom:0.5rem;">🛠️ Nueva Solicitud</h2>
+      <p style="color:var(--text-2); margin-bottom:2rem; font-size:0.95rem;">Describí el problema de tu dispositivo. Mientras más detalle mejor.</p>
+
+      <form action="/client/request/new" method="POST" enctype="multipart/form-data" id="req-form">
         <div class="form-group">
-          <label>Título del Problema</label>
-          <input type="text" name="title" class="form-control" placeholder="Ej: Pantalla rota iPhone 13" required>
+          <label for="title">Título del problema</label>
+          <input type="text" id="title" name="title" class="form-control" placeholder="Ej: Pantalla rota iPhone 13" required>
         </div>
+
         <div class="form-group">
-          <label>Descripción Detallada</label>
-          <textarea name="description" class="form-control" rows="5" placeholder="Describe qué le pasó al dispositivo..." required></textarea>
+          <label for="description">Descripción detallada</label>
+          <textarea id="description" name="description" class="form-control" rows="5" placeholder="Describí qué le pasó al dispositivo, cuándo empezó el problema, síntomas, etc." required></textarea>
         </div>
+
         <div class="form-group">
-          <label>Información Adicional (Opcional)</label>
-          <textarea name="additional_info" class="form-control" rows="3" placeholder="Contraseñas, detalles técnicos, etc."></textarea>
+          <label for="additional_info">Información técnica adicional <span style="color:var(--text-3); font-weight:400;">(opcional)</span></label>
+          <textarea id="additional_info" name="additional_info" class="form-control" rows="3" placeholder="Contraseñas de desbloqueo, actualizaciones realizadas, piezas cambiadas, etc."></textarea>
         </div>
-        <!-- En el futuro aquí iría la subida de archivos (multer + cloud storage) -->
-        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Crear Solicitud</button>
+
+        <div class="form-group">
+          <label>Fotos / Videos <span style="color:var(--text-3); font-weight:400;">(opcional, máx. 5 archivos)</span></label>
+          <label class="file-input-label">
+            <span>📎</span>
+            <span id="media-label">Seleccionar fotos o videos...</span>
+            <input type="file" name="media" id="media-input" accept="image/*,video/*" multiple onchange="updateMediaLabel(event)">
+          </label>
+          <div id="media-previews" style="display:none; margin-top:0.75rem;" class="media-grid"></div>
+        </div>
+
+        <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;" id="submit-btn">
+          Enviar Solicitud →
+        </button>
       </form>
     </div>
   </div>
+
+  <script>
+    function updateMediaLabel(event) {
+      const files = Array.from(event.target.files).slice(0, 5);
+      const label = document.getElementById('media-label');
+      const previews = document.getElementById('media-previews');
+      label.textContent = `${files.length} archivo(s) seleccionado(s)`;
+      previews.innerHTML = '';
+      if (files.length > 0) previews.style.display = 'grid';
+      files.forEach(file => {
+        const isVideo = file.type.startsWith('video/');
+        const el = isVideo ? document.createElement('video') : document.createElement('img');
+        el.className = 'media-thumb';
+        if (isVideo) { el.controls = false; el.muted = true; }
+        const reader = new FileReader();
+        reader.onload = e => { el.src = e.target.result; };
+        reader.readAsDataURL(file);
+        previews.appendChild(el);
+      });
+    }
+
+    document.getElementById('req-form').addEventListener('submit', function() {
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = 'Enviando solicitud...';
+      btn.disabled = true;
+    });
+  </script>
 </body>
 </html>

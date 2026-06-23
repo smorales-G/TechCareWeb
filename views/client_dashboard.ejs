@@ -2,56 +2,74 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Client Dashboard - TechCare.mza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Solicitudes — TechCare.mza</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <nav class="navbar">
     <a href="/" class="logo">TechCare<span>.mza</span></a>
     <div class="nav-links">
-      <span style="color: var(--text-muted); margin-right: 20px;">Hola, <%= user.username %></span>
-      <a href="/logout" class="btn btn-secondary">Cerrar Sesión</a>
+      <% if (user.profile_picture) { %>
+        <img src="<%= user.profile_picture %>" class="avatar" alt="<%= user.username %>" title="<%= user.username %>">
+      <% } else { %>
+        <div class="avatar-placeholder" title="<%= user.username %>"><%= user.username.charAt(0).toUpperCase() %></div>
+      <% } %>
+      <span style="color:var(--text-2); font-size:0.9rem;">Hola, <strong style="color:var(--text)"><%= user.username %></strong></span>
+      <a href="/logout" class="btn btn-secondary btn-sm">Salir</a>
     </div>
   </nav>
 
   <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-      <h2>Mis Solicitudes</h2>
+    <div class="page-header">
+      <div>
+        <h2>Mis Solicitudes</h2>
+        <p style="color:var(--text-2); font-size:0.9rem; margin-top:0.25rem;">Estado de tus reparaciones y consultas</p>
+      </div>
       <a href="/client/request/new" class="btn">+ Nueva Solicitud</a>
     </div>
 
-    <div class="grid">
-      <% if (requests.length === 0) { %>
-        <p style="color: var(--text-muted);">No tienes solicitudes activas. Crea una nueva.</p>
-      <% } else { %>
+    <% if (requests.length === 0) { %>
+      <div class="empty-state glass-card">
+        <span class="empty-icon">🛠️</span>
+        <h3>Sin solicitudes todavía</h3>
+        <p>Creá tu primera solicitud describiendo el problema de tu dispositivo.</p>
+        <a href="/client/request/new" class="btn" style="margin-top:1.5rem;">Crear solicitud</a>
+      </div>
+    <% } else { %>
+      <div class="grid">
         <% requests.forEach(r => { %>
-          <div class="glass-card">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-              <h3 style="color: #fff;"><%= r.title %></h3>
+          <div class="request-card">
+            <div class="request-card-header">
+              <h3><%= r.title %></h3>
               <span class="badge <%= r.status %>"><%= r.status.replace(/_/g, ' ') %></span>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-              <%= r.description.substring(0, 80) %>...
-            </p>
-            
-            <% if (r.status === 'en_diagnostico') { %>
-              <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <p><strong>Diagnóstico:</strong> <%= r.diagnosis %></p>
-                <p><strong>Precio:</strong> $<%= r.price %></p>
+
+            <p class="desc"><%= r.description.length > 100 ? r.description.substring(0, 100) + '...' : r.description %></p>
+
+            <% if (r.status === 'en_diagnostico' && r.diagnosis) { %>
+              <div class="diagnosis-box">
+                <p><strong>🔍 Diagnóstico:</strong> <%= r.diagnosis %></p>
+                <% if (r.price) { %><p style="margin-top:0.5rem;"><strong>💰 Precio:</strong> $<%= Number(r.price).toLocaleString('es-AR') %></p><% } %>
               </div>
-              <form action="/client/request/<%= r.id %>/action" method="POST" style="display: flex; gap: 10px;">
-                <button type="submit" name="action" value="accept" class="btn" style="background: #22c55e; flex: 1;">Aceptar</button>
-                <button type="submit" name="action" value="decline" class="btn btn-secondary" style="border-color: #ef4444; color: #ef4444; flex: 1;">Rechazar</button>
-              </form>
+              <div class="action-btns">
+                <form action="/client/request/<%= r.id %>/action" method="POST" style="flex:1;">
+                  <button type="submit" name="action" value="accept" class="btn btn-success" style="width:100%;">✅ Aceptar</button>
+                </form>
+                <form action="/client/request/<%= r.id %>/action" method="POST" style="flex:1;">
+                  <button type="submit" name="action" value="decline" class="btn btn-danger" style="width:100%;">❌ Rechazar</button>
+                </form>
+              </div>
             <% } %>
 
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
-              Creado: <%= new Date(r.created_at).toLocaleDateString() %>
+            <div class="request-card-footer">
+              <span>📅 <%= new Date(r.created_at).toLocaleDateString('es-AR', {day:'2-digit', month:'short', year:'numeric'}) %></span>
+              <a href="/client/request/<%= r.id %>" style="color:var(--accent); font-size:0.85rem; font-weight:600; text-decoration:none;">Ver historial →</a>
             </div>
           </div>
         <% }) %>
-      <% } %>
-    </div>
+      </div>
+    <% } %>
   </div>
 </body>
 </html>

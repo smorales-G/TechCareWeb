@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle Solicitud — TechCare.mza</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">TechCare<span>.mza</span></a>
+    <div class="nav-links">
+      <a href="/client/dashboard" class="btn btn-secondary btn-sm">← Volver</a>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width: 900px; margin: 0 auto;">
+    <!-- Header -->
+    <div class="page-header fade-up">
+      <div>
+        <p style="color:var(--text-2); font-size:0.85rem; margin-bottom:0.35rem;">Solicitud #<%= request.id %></p>
+        <h2><%= request.title %></h2>
+      </div>
+      <span class="badge <%= request.status %>"><%= request.status.replace(/_/g, ' ') %></span>
+    </div>
+
+    <div class="grid-2" style="gap:1.5rem;">
+      <!-- Columna izquierda: info -->
+      <div style="display:flex; flex-direction:column; gap:1.5rem;">
+
+        <!-- Descripción -->
+        <div class="glass-card fade-up">
+          <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--text-2);">📋 Descripción</h3>
+          <p style="font-size:0.95rem; line-height:1.7;"><%= request.description %></p>
+          <% if (request.additional_info) { %>
+            <hr style="border:0; border-top:1px solid var(--border); margin:1rem 0;">
+            <p style="font-size:0.85rem; color:var(--text-2);"><strong>Info técnica:</strong> <%= request.additional_info %></p>
+          <% } %>
+        </div>
+
+        <!-- Diagnóstico / Precio -->
+        <% if (request.diagnosis) { %>
+          <div class="glass-card fade-up" style="border-color: rgba(168,85,247,0.3);">
+            <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--purple);">🔍 Diagnóstico del técnico</h3>
+            <p style="font-size:0.95rem; line-height:1.7; margin-bottom:0.75rem;"><%= request.diagnosis %></p>
+            <% if (request.price) { %>
+              <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:0.75rem; display:inline-block;">
+                <span style="font-size:1.25rem; font-weight:900; color:var(--green);">$<%= Number(request.price).toLocaleString('es-AR') %></span>
+              </div>
+            <% } %>
+
+            <% if (request.status === 'en_diagnostico') { %>
+              <div style="margin-top:1.25rem; display:flex; gap:0.75rem;">
+                <form action="/client/request/<%= request.id %>/action" method="POST" style="flex:1;">
+                  <button type="submit" name="action" value="accept" class="btn btn-success" style="width:100%;">✅ Aceptar reparación</button>
+                </form>
+                <form action="/client/request/<%= request.id %>/action" method="POST" style="flex:1;">
+                  <button type="submit" name="action" value="decline" class="btn btn-danger" style="width:100%;">❌ Rechazar</button>
+                </form>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+
+        <!-- Media adjunta -->
+        <% if (media && media.length > 0) { %>
+          <div class="glass-card fade-up">
+            <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--text-2);">📎 Archivos adjuntos</h3>
+            <div class="media-grid">
+              <% media.forEach(m => { %>
+                <% const isVideo = m.media_url && (m.media_url.includes('.mp4') || m.media_url.includes('.mov') || m.media_url.includes('.webm')); %>
+                <% if (isVideo) { %>
+                  <video src="<%= m.media_url %>" class="media-thumb" controls muted></video>
+                <% } else { %>
+                  <img src="<%= m.media_url %>" class="media-thumb" alt="Adjunto" onclick="window.open(this.src,'_blank')">
+                <% } %>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+      </div>
+
+      <!-- Columna derecha: historial timeline -->
+      <div class="glass-card fade-up" style="align-self:start;">
+        <h3 style="font-size:1rem; margin-bottom:1.5rem; color:var(--text-2);">🕐 Historial de estados</h3>
+        <% if (history && history.length > 0) { %>
+          <div class="timeline">
+            <% history.forEach((h, i) => { %>
+              <div class="timeline-item">
+                <div class="timeline-left">
+                  <div class="timeline-dot" style="background:<%= i === 0 ? 'var(--accent)' : 'var(--text-3)' %>"></div>
+                  <div class="timeline-line"></div>
+                </div>
+                <div class="timeline-content">
+                  <div class="tl-status"><span class="badge <%= h.status %>" style="font-size:0.7rem;"><%= h.status.replace(/_/g, ' ') %></span></div>
+                  <% if (h.notes) { %><div class="tl-notes" style="margin-top:0.4rem;"><%= h.notes %></div><% } %>
+                  <div class="tl-date">📅 <%= new Date(h.created_at).toLocaleDateString('es-AR', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) %></div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p style="color:var(--text-3); font-size:0.9rem;">Sin historial registrado.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

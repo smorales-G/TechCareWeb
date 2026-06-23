@@ -2,80 +2,113 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Tech Dashboard - TechCare.mza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Técnico — TechCare.mza</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <nav class="navbar">
-    <a href="/" class="logo">TechCare<span>.mza</span> <small style="color:#ef4444; font-size:0.8rem;">[Tech Panel]</small></a>
+    <a href="/" class="logo">TechCare<span>.mza</span> <small style="color:var(--red); font-size:0.7rem; font-weight:700;">[TÉCNICO]</small></a>
     <div class="nav-links">
-      <span style="color: var(--text-muted); margin-right: 20px;">Técnico: <%= user.username %></span>
-      <a href="/logout" class="btn btn-secondary">Cerrar Sesión</a>
+      <div class="avatar-placeholder" title="<%= user.username %>"><%= user.username.charAt(0).toUpperCase() %></div>
+      <span style="color:var(--text-2); font-size:0.9rem;"><%= user.username %></span>
+      <a href="/logout" class="btn btn-secondary btn-sm">Salir</a>
     </div>
   </nav>
 
   <div class="container">
-    <h2 style="margin-bottom: 2rem;">Gestión de Solicitudes</h2>
+    <div class="page-header">
+      <div>
+        <h2>Gestión de Solicitudes</h2>
+        <p style="color:var(--text-2); font-size:0.9rem; margin-top:0.25rem;"><%= requests.length %> solicitud(es) en el sistema</p>
+      </div>
+    </div>
 
-    <div class="grid">
-      <% if (requests.length === 0) { %>
-        <p style="color: var(--text-muted);">No hay solicitudes en el sistema.</p>
-      <% } else { %>
+    <% if (requests.length === 0) { %>
+      <div class="empty-state glass-card">
+        <span class="empty-icon">📭</span>
+        <h3>Sin solicitudes pendientes</h3>
+        <p>Cuando los clientes creen solicitudes aparecerán aquí.</p>
+      </div>
+    <% } else { %>
+      <div class="grid">
         <% requests.forEach(r => { %>
-          <div class="glass-card">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-              <h3 style="color: #fff; font-size: 1.1rem;"><%= r.title %></h3>
+          <div class="request-card">
+            <div class="request-card-header">
+              <div>
+                <h3><%= r.title %></h3>
+                <p style="font-size:0.82rem; color:var(--accent); margin-top:0.2rem; font-weight:600;">👤 <%= r.client_name %></p>
+              </div>
               <span class="badge <%= r.status %>"><%= r.status.replace(/_/g, ' ') %></span>
             </div>
-            
-            <p style="color: var(--accent-color); font-size: 0.9rem; margin-bottom: 0.5rem;">
-              Cliente: <%= r.client_name %>
-            </p>
-            
-            <div style="background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem;">
-              <p style="color: var(--text-muted); font-size: 0.9rem;"><%= r.description %></p>
+
+            <div style="background:rgba(0,0,0,0.2); padding:0.75rem; border-radius:8px;">
+              <p style="color:var(--text-2); font-size:0.88rem; line-height:1.55;"><%= r.description %></p>
               <% if (r.additional_info) { %>
-                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 0.5rem 0;">
-                <p style="color: #94a3b8; font-size: 0.8rem;"><strong>Info Extra:</strong> <%= r.additional_info %></p>
+                <p style="color:var(--text-3); font-size:0.8rem; margin-top:0.5rem;"><strong>Info técnica:</strong> <%= r.additional_info %></p>
               <% } %>
             </div>
 
-            <form action="/tech/request/<%= r.id %>/status" method="POST">
-              <div class="form-group" style="margin-bottom: 0.5rem;">
-                <label style="font-size: 0.85rem;">Estado</label>
-                <select name="status" class="form-control" style="padding: 0.5rem;">
-                  <option value="pendiente" <%= r.status === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
-                  <option value="en_revision" <%= r.status === 'en_revision' ? 'selected' : '' %>>En Revisión</option>
-                  <option value="consulta_denegada" <%= r.status === 'consulta_denegada' ? 'selected' : '' %>>Consulta Denegada</option>
-                  <option value="en_diagnostico" <%= r.status === 'en_diagnostico' ? 'selected' : '' %>>En Diagnóstico</option>
-                  <option value="reparacion_aceptada" <%= r.status === 'reparacion_aceptada' ? 'selected' : '' %>>Reparación Aceptada</option>
-                  <option value="en_proceso_de_devolucion" <%= r.status === 'en_proceso_de_devolucion' ? 'selected' : '' %>>En Proceso de Devolución</option>
-                  <option value="reparacion_completa" <%= r.status === 'reparacion_completa' ? 'selected' : '' %>>Reparación Completa</option>
-                  <option value="finalizado" <%= r.status === 'finalizado' ? 'selected' : '' %>>Finalizado</option>
-                </select>
+            <!-- Media adjunta -->
+            <% if (r.media && r.media.length > 0) { %>
+              <div>
+                <p style="font-size:0.8rem; color:var(--text-2); margin-bottom:0.5rem; font-weight:600;">📎 Adjuntos</p>
+                <div class="media-grid">
+                  <% r.media.forEach(m => { %>
+                    <% const isVideo = m.media_url && (m.media_url.includes('.mp4') || m.media_url.includes('.mov') || m.media_url.includes('.webm')); %>
+                    <% if (isVideo) { %>
+                      <video src="<%= m.media_url %>" class="media-thumb" controls muted></video>
+                    <% } else { %>
+                      <img src="<%= m.media_url %>" class="media-thumb" alt="Adjunto" onclick="window.open(this.src,'_blank')" title="Ver imagen">
+                    <% } %>
+                  <% }) %>
+                </div>
               </div>
+            <% } %>
 
-              <div class="form-group" style="margin-bottom: 0.5rem;">
-                <label style="font-size: 0.85rem;">Diagnóstico</label>
-                <textarea name="diagnosis" class="form-control" rows="2" placeholder="Detalle del diagnóstico..."><%= r.diagnosis || '' %></textarea>
-              </div>
+            <!-- Formulario actualizar estado -->
+            <details class="tech-form">
+              <summary style="cursor:pointer; font-size:0.9rem; font-weight:700; color:var(--accent); list-style:none; padding:0.5rem 0;">
+                ⚙️ Actualizar estado
+              </summary>
+              <form action="/tech/request/<%= r.id %>/status" method="POST" style="margin-top:1rem; display:flex; flex-direction:column; gap:0.75rem;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:0.8rem;">Estado</label>
+                  <select name="status" class="form-control" style="padding:0.6rem;">
+                    <option value="pendiente"                 <%= r.status==='pendiente'                 ?'selected':'' %>>Pendiente</option>
+                    <option value="en_revision"               <%= r.status==='en_revision'               ?'selected':'' %>>En Revisión</option>
+                    <option value="solicitud_finalizada"      <%= r.status==='solicitud_finalizada'      ?'selected':'' %>>Solicitud Finalizada</option>
+                    <option value="consulta_denegada"         <%= r.status==='consulta_denegada'         ?'selected':'' %>>Consulta Denegada</option>
+                    <option value="en_diagnostico"            <%= r.status==='en_diagnostico'            ?'selected':'' %>>En Diagnóstico</option>
+                    <option value="reparacion_aceptada"       <%= r.status==='reparacion_aceptada'       ?'selected':'' %>>Reparación Aceptada</option>
+                    <option value="en_proceso_de_devolucion"  <%= r.status==='en_proceso_de_devolucion'  ?'selected':'' %>>En Proceso de Devolución</option>
+                    <option value="reparacion_completa"       <%= r.status==='reparacion_completa'       ?'selected':'' %>>Reparación Completa</option>
+                    <option value="finalizado"                <%= r.status==='finalizado'                ?'selected':'' %>>Finalizado</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:0.8rem;">Diagnóstico</label>
+                  <textarea name="diagnosis" class="form-control" rows="2" placeholder="Detalle del diagnóstico..."><%= r.diagnosis || '' %></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:0.8rem;">Precio ($)</label>
+                  <input type="number" step="0.01" name="price" class="form-control" value="<%= r.price || '' %>" placeholder="0.00">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:0.8rem;">Notas para el historial</label>
+                  <input type="text" name="notes" class="form-control" placeholder="Ej: Se coordinó entrega por WhatsApp">
+                </div>
+                <button type="submit" class="btn btn-sm" style="align-self:flex-end;">Guardar cambios</button>
+              </form>
+            </details>
 
-              <div class="form-group" style="margin-bottom: 1rem;">
-                <label style="font-size: 0.85rem;">Precio ($)</label>
-                <input type="number" step="0.01" name="price" class="form-control" value="<%= r.price || '' %>" placeholder="0.00">
-              </div>
-
-              <div class="form-group" style="margin-bottom: 1rem;">
-                <label style="font-size: 0.85rem;">Notas para el Historial</label>
-                <input type="text" name="notes" class="form-control" placeholder="Ej: Se coordinó entrega por teléfono">
-              </div>
-
-              <button type="submit" class="btn btn-secondary" style="width: 100%; font-size: 0.9rem;">Actualizar Estado</button>
-            </form>
+            <div class="request-card-footer">
+              <span>📅 <%= new Date(r.created_at).toLocaleDateString('es-AR', {day:'2-digit', month:'short', year:'numeric'}) %></span>
+            </div>
           </div>
         <% }) %>
-      <% } %>
-    </div>
+      </div>
+    <% } %>
   </div>
 </body>
 </html>

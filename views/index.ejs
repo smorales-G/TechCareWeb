@@ -2,42 +2,210 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>TechCare.mza - Premium Tech Maintenance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TechCare.mza — Servicio de mantenimiento técnico premium para computadoras, consolas, impresoras, teléfonos, laptops y tablets en Mendoza. Registrate y seguí el estado de tu reparación en tiempo real.">
+  <title>TechCare.mza — Mantenimiento Técnico en Mendoza</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
+  <!-- NAVBAR -->
   <nav class="navbar">
     <a href="/" class="logo">TechCare<span>.mza</span></a>
     <div class="nav-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#como-funciona">¿Cómo funciona?</a>
       <% if (user) { %>
-        <% if (user.role === 'technician') { %>
-          <a href="/tech/dashboard">Dashboard</a>
+        <% if (user.role === 'admin') { %>
+          <a href="/admin/dashboard">Panel Admin</a>
+        <% } else if (user.role === 'technician') { %>
+          <a href="/tech/dashboard">Panel Técnico</a>
         <% } else { %>
           <a href="/client/dashboard">Mis Solicitudes</a>
         <% } %>
-        <a href="/logout">Cerrar Sesión</a>
+        <a href="/logout" class="btn btn-secondary btn-sm">Cerrar Sesión</a>
       <% } else { %>
-        <a href="/login" class="btn btn-secondary">Login</a>
-        <a href="/register" class="btn">Empezar</a>
+        <a href="/login">Iniciar Sesión</a>
+        <a href="/register" class="btn btn-sm">Empezar gratis</a>
       <% } %>
     </div>
   </nav>
 
-  <div class="container hero">
-    <h1>Reparación Experta</h1>
-    <p>Mantenimiento técnico premium para computadoras, consolas, laptops y tablets en Mendoza.</p>
-    <% if (!user) { %>
-      <a href="/register" class="btn">Crea una Solicitud Ahora</a>
-    <% } else { %>
-      <a href="/client/request/new" class="btn">Nueva Solicitud</a>
-    <% } %>
-  </div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow fade-up">
+      <span>🔧</span> Mantenimiento Técnico Premium · Mendoza
+    </div>
+    <h1 class="fade-up fade-up-1">
+      Tu dispositivo,<br>
+      <span class="accent">en manos expertas</span>
+    </h1>
+    <p class="fade-up fade-up-2">
+      Reparamos computadoras, consolas, impresoras, teléfonos, laptops y tablets.
+      Seguí cada etapa de tu reparación en tiempo real desde nuestra plataforma.
+    </p>
+    <div class="hero-cta fade-up fade-up-3">
+      <% if (!user) { %>
+        <a href="/register" class="btn">Crear cuenta gratis</a>
+        <a href="/login" class="btn btn-secondary">Iniciar sesión</a>
+      <% } else { %>
+        <a href="/client/request/new" class="btn">+ Nueva Solicitud</a>
+        <a href="/client/dashboard" class="btn btn-secondary">Ver mis solicitudes</a>
+      <% } %>
+    </div>
+  </section>
 
-  <!-- Chatbot Widget -->
+  <!-- SERVICIOS -->
+  <section class="section" id="servicios" style="background: rgba(255,255,255,0.015);">
+    <div class="section-header">
+      <div class="section-tag">Servicios</div>
+      <h2>Todo tipo de dispositivos</h2>
+      <p>Trabajamos con la mayoría de marcas y modelos del mercado. Si tenés dudas, consultanos.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card fade-up">
+        <span class="service-icon">💻</span>
+        <h3>Computadoras</h3>
+        <p>PC de escritorio, hardware, software, limpieza y optimización</p>
+      </div>
+      <div class="service-card fade-up fade-up-1">
+        <span class="service-icon">🎮</span>
+        <h3>Consolas</h3>
+        <p>PlayStation, Xbox, Nintendo Switch y más</p>
+      </div>
+      <div class="service-card fade-up fade-up-2">
+        <span class="service-icon">🖨️</span>
+        <h3>Impresoras</h3>
+        <p>Inkjet, láser, multifunción, cabezales y cartuchos</p>
+      </div>
+      <div class="service-card fade-up fade-up-3">
+        <span class="service-icon">📱</span>
+        <h3>Teléfonos</h3>
+        <p>iPhone, Android, pantallas, batería y más</p>
+      </div>
+      <div class="service-card fade-up fade-up-4">
+        <span class="service-icon">🖥️</span>
+        <h3>Laptops</h3>
+        <p>Notebooks y ultrabooks de todas las marcas</p>
+      </div>
+      <div class="service-card fade-up fade-up-4">
+        <span class="service-icon">📲</span>
+        <h3>Tablets</h3>
+        <p>iPad, Samsung Tab, Lenovo y más marcas</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="section" id="como-funciona">
+    <div class="section-header">
+      <div class="section-tag">Proceso</div>
+      <h2>¿Cómo funciona?</h2>
+      <p>Seguí tu reparación en tiempo real con un proceso claro y transparente.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card fade-up">
+        <div class="step-number">1</div>
+        <h3>Creás la solicitud</h3>
+        <p>Describí el problema, adjuntá fotos o videos del dispositivo y enviá la consulta desde tu cuenta.</p>
+      </div>
+      <div class="step-card fade-up fade-up-1">
+        <div class="step-number">2</div>
+        <h3>Revisión del técnico</h3>
+        <p>Un técnico analiza tu solicitud, se pone en contacto para coordinar la entrega del dispositivo.</p>
+      </div>
+      <div class="step-card fade-up fade-up-2">
+        <div class="step-number">3</div>
+        <h3>Diagnóstico y presupuesto</h3>
+        <p>Recibís el diagnóstico con el precio del mantenimiento y decidís si aceptar o no.</p>
+      </div>
+      <div class="step-card fade-up fade-up-3">
+        <div class="step-number">4</div>
+        <h3>Reparación y entrega</h3>
+        <p>Si aceptás, comenzamos la reparación. Te avisamos cuando esté lista para coordinar la devolución.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- POR QUÉ ELEGIRNOS -->
+  <section class="section" style="background: rgba(255,255,255,0.015);">
+    <div class="section-header">
+      <div class="section-tag">Ventajas</div>
+      <h2>¿Por qué TechCare.mza?</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-icon">📡</span>
+        <div>
+          <h4>Seguimiento en tiempo real</h4>
+          <p>Conocés el estado exacto de tu dispositivo en cada momento desde tu dashboard.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔒</span>
+        <div>
+          <h4>Transparencia total</h4>
+          <p>Antes de cualquier reparación recibís un presupuesto que podés aceptar o rechazar.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">⚡</span>
+        <div>
+          <h4>Técnicos especializados</h4>
+          <p>Profesionales con experiencia en múltiples marcas y modelos de dispositivos.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🤖</span>
+        <div>
+          <h4>Soporte IA 24/7</h4>
+          <p>Nuestro asistente virtual puede responder tus consultas en cualquier momento.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">📁</span>
+        <div>
+          <h4>Historial completo</h4>
+          <p>Guardamos el historial de cada reparación para que tengas todo registrado.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">📍</span>
+        <div>
+          <h4>Basados en Mendoza</h4>
+          <p>Servicio local, con atención personalizada y coordinación de entrega en persona.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="section" style="text-align:center;">
+    <h2 style="font-size:2.2rem; font-weight:900; margin-bottom:1rem;">¿Tu dispositivo necesita atención?</h2>
+    <p style="color:var(--text-2); margin-bottom:2rem; font-size:1.05rem;">Registrate gratis y creá tu primera solicitud en menos de 2 minutos.</p>
+    <% if (!user) { %>
+      <a href="/register" class="btn">Empezar ahora →</a>
+    <% } else { %>
+      <a href="/client/request/new" class="btn">+ Nueva Solicitud</a>
+    <% } %>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 TechCare.mza — Mendoza, Argentina</p>
+    <div class="footer-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#como-funciona">Proceso</a>
+      <a href="/login">Login</a>
+      <a href="/register">Registro</a>
+    </div>
+  </footer>
+
+  <!-- CHATBOT WIDGET -->
   <div class="chatbot-widget collapsed" id="chatbot">
     <div class="chatbot-header" onclick="toggleChat()">
-      <h3>🤖 Soporte TechCare</h3>
-      <span id="chat-toggle-icon">▲</span>
+      <h3>🤖 Soporte TechCare IA</h3>
+      <span class="toggle-icon" id="chat-toggle-icon">▲</span>
     </div>
     <div class="chatbot-messages" id="chat-messages">
       <div class="message bot">¡Hola! Soy la IA de soporte de TechCare. ¿En qué te puedo ayudar hoy?</div>
@@ -53,9 +221,8 @@
     const chatIcon = document.getElementById('chat-toggle-icon');
     const messagesContainer = document.getElementById('chat-messages');
     const inputField = document.getElementById('chat-input');
-
     let conversation = [
-      { role: 'system', content: 'Eres el asistente virtual premium de TechCare.mza, un servicio de mantenimiento de dispositivos en Mendoza. Responde de forma amable, corta y útil.' }
+      { role: 'system', content: 'Eres el asistente virtual de TechCare.mza, un servicio de mantenimiento técnico de dispositivos en Mendoza, Argentina. Responde en español, de forma amable y concisa. Puedes ayudar con consultas sobre tipos de reparaciones, el proceso, y precios aproximados.' }
     ];
 
     function toggleChat() {
@@ -63,58 +230,48 @@
       chatIcon.textContent = chatWidget.classList.contains('collapsed') ? '▲' : '▼';
     }
 
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') sendMessage();
-    }
+    function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
 
     async function sendMessage() {
       const text = inputField.value.trim();
       if (!text) return;
-
-      // Add user message to UI
       addMessage(text, 'user');
       inputField.value = '';
-      
-      // Update conversation history
       conversation.push({ role: 'user', content: text });
-
-      // Add bot typing indicator
       const typingId = 'typing-' + Date.now();
-      addMessage('...', 'bot', typingId);
-
+      const typingEl = document.createElement('div');
+      typingEl.className = 'message bot'; typingEl.id = typingId;
+      typingEl.innerHTML = '<span class="typing-dot">●</span> <span class="typing-dot" style="animation-delay:0.2s">●</span> <span class="typing-dot" style="animation-delay:0.4s">●</span>';
+      messagesContainer.appendChild(typingEl);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
       try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: conversation })
-        });
+        const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conversation }) });
         const data = await res.json();
-        
-        // Remove typing indicator
-        const typingEl = document.getElementById(typingId);
-        if (typingEl) typingEl.remove();
-
-        if (data.message && data.message.content) {
-          const botReply = data.message.content;
-          addMessage(botReply, 'bot');
-          conversation.push({ role: 'assistant', content: botReply });
-        } else {
-          addMessage('Hubo un error de conexión con la IA.', 'bot');
-        }
-      } catch (err) {
         document.getElementById(typingId)?.remove();
-        addMessage('No se pudo conectar con soporte.', 'bot');
-      }
+        if (data.message?.content) {
+          addMessage(data.message.content, 'bot');
+          conversation.push({ role: 'assistant', content: data.message.content });
+        } else { addMessage('Hubo un error al conectar con el asistente.', 'bot'); }
+      } catch { document.getElementById(typingId)?.remove(); addMessage('No se pudo conectar con soporte.', 'bot'); }
     }
 
-    function addMessage(text, sender, id = null) {
+    function addMessage(text, sender) {
       const div = document.createElement('div');
       div.className = `message ${sender}`;
       div.textContent = text;
-      if (id) div.id = id;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+
+    // Scroll reveal animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = 1; e.target.style.transform = 'translateY(0)'; } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.service-card, .step-card, .why-card').forEach(el => {
+      el.style.opacity = 0; el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
   </script>
 </body>
 </html>
