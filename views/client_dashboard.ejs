@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Client Dashboard - TechCare.mza</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">TechCare<span>.mza</span></a>
+    <div class="nav-links">
+      <span style="color: var(--text-muted); margin-right: 20px;">Hola, <%= user.username %></span>
+      <a href="/logout" class="btn btn-secondary">Cerrar Sesión</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h2>Mis Solicitudes</h2>
+      <a href="/client/request/new" class="btn">+ Nueva Solicitud</a>
+    </div>
+
+    <div class="grid">
+      <% if (requests.length === 0) { %>
+        <p style="color: var(--text-muted);">No tienes solicitudes activas. Crea una nueva.</p>
+      <% } else { %>
+        <% requests.forEach(r => { %>
+          <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <h3 style="color: #fff;"><%= r.title %></h3>
+              <span class="badge <%= r.status %>"><%= r.status.replace(/_/g, ' ') %></span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+              <%= r.description.substring(0, 80) %>...
+            </p>
+            
+            <% if (r.status === 'en_diagnostico') { %>
+              <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <p><strong>Diagnóstico:</strong> <%= r.diagnosis %></p>
+                <p><strong>Precio:</strong> $<%= r.price %></p>
+              </div>
+              <form action="/client/request/<%= r.id %>/action" method="POST" style="display: flex; gap: 10px;">
+                <button type="submit" name="action" value="accept" class="btn" style="background: #22c55e; flex: 1;">Aceptar</button>
+                <button type="submit" name="action" value="decline" class="btn btn-secondary" style="border-color: #ef4444; color: #ef4444; flex: 1;">Rechazar</button>
+              </form>
+            <% } %>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+              Creado: <%= new Date(r.created_at).toLocaleDateString() %>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

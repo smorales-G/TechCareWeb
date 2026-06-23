@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>TechCare.mza - Premium Tech Maintenance</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">TechCare<span>.mza</span></a>
+    <div class="nav-links">
+      <% if (user) { %>
+        <% if (user.role === 'technician') { %>
+          <a href="/tech/dashboard">Dashboard</a>
+        <% } else { %>
+          <a href="/client/dashboard">Mis Solicitudes</a>
+        <% } %>
+        <a href="/logout">Cerrar Sesión</a>
+      <% } else { %>
+        <a href="/login" class="btn btn-secondary">Login</a>
+        <a href="/register" class="btn">Empezar</a>
+      <% } %>
+    </div>
+  </nav>
+
+  <div class="container hero">
+    <h1>Reparación Experta</h1>
+    <p>Mantenimiento técnico premium para computadoras, consolas, laptops y tablets en Mendoza.</p>
+    <% if (!user) { %>
+      <a href="/register" class="btn">Crea una Solicitud Ahora</a>
+    <% } else { %>
+      <a href="/client/request/new" class="btn">Nueva Solicitud</a>
+    <% } %>
+  </div>
+
+  <!-- Chatbot Widget -->
+  <div class="chatbot-widget collapsed" id="chatbot">
+    <div class="chatbot-header" onclick="toggleChat()">
+      <h3>🤖 Soporte TechCare</h3>
+      <span id="chat-toggle-icon">▲</span>
+    </div>
+    <div class="chatbot-messages" id="chat-messages">
+      <div class="message bot">¡Hola! Soy la IA de soporte de TechCare. ¿En qué te puedo ayudar hoy?</div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" id="chat-input" placeholder="Escribe tu consulta..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    const chatWidget = document.getElementById('chatbot');
+    const chatIcon = document.getElementById('chat-toggle-icon');
+    const messagesContainer = document.getElementById('chat-messages');
+    const inputField = document.getElementById('chat-input');
+
+    let conversation = [
+      { role: 'system', content: 'Eres el asistente virtual premium de TechCare.mza, un servicio de mantenimiento de dispositivos en Mendoza. Responde de forma amable, corta y útil.' }
+    ];
+
+    function toggleChat() {
+      chatWidget.classList.toggle('collapsed');
+      chatIcon.textContent = chatWidget.classList.contains('collapsed') ? '▲' : '▼';
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    async function sendMessage() {
+      const text = inputField.value.trim();
+      if (!text) return;
+
+      // Add user message to UI
+      addMessage(text, 'user');
+      inputField.value = '';
+      
+      // Update conversation history
+      conversation.push({ role: 'user', content: text });
+
+      // Add bot typing indicator
+      const typingId = 'typing-' + Date.now();
+      addMessage('...', 'bot', typingId);
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: conversation })
+        });
+        const data = await res.json();
+        
+        // Remove typing indicator
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        if (data.message && data.message.content) {
+          const botReply = data.message.content;
+          addMessage(botReply, 'bot');
+          conversation.push({ role: 'assistant', content: botReply });
+        } else {
+          addMessage('Hubo un error de conexión con la IA.', 'bot');
+        }
+      } catch (err) {
+        document.getElementById(typingId)?.remove();
+        addMessage('No se pudo conectar con soporte.', 'bot');
+      }
+    }
+
+    function addMessage(text, sender, id = null) {
+      const div = document.createElement('div');
+      div.className = `message ${sender}`;
+      div.textContent = text;
+      if (id) div.id = id;
+      messagesContainer.appendChild(div);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  </script>
+</body>
+</html>

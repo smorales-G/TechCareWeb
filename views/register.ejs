@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro - TechCare.mza</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">TechCare<span>.mza</span></a>
+  </nav>
+
+  <div class="container">
+    <div class="auth-container glass-card">
+      <h2 style="margin-bottom: 1.5rem; text-align: center;">Crear Cuenta</h2>
+      <% if (error) { %>
+        <p style="color: #ef4444; margin-bottom: 1rem; text-align: center;"><%= error %></p>
+      <% } %>
+      <form action="/register" method="POST">
+        <div class="form-group">
+          <label>Nombre de Usuario</label>
+          <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Código Secreto (Opcional)</label>
+          <input type="text" name="tech_code" class="form-control" placeholder="Técnico / Admin">
+        </div>
+        <button type="submit" class="btn" style="width: 100%;">Registrarse</button>
+      </form>
+      <p style="margin-top: 1.5rem; text-align: center; color: var(--text-muted);">
+        ¿Ya tienes cuenta? <a href="/login" style="color: var(--accent-color);">Inicia Sesión</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

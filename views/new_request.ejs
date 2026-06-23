@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Nueva Solicitud - TechCare.mza</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">TechCare<span>.mza</span></a>
+    <div class="nav-links">
+      <a href="/client/dashboard" class="btn btn-secondary">Volver</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="glass-card" style="max-width: 600px; margin: 0 auto; width: 100%;">
+      <h2 style="margin-bottom: 1.5rem;">Solicitar Reparación</h2>
+      <form action="/client/request/new" method="POST">
+        <div class="form-group">
+          <label>Título del Problema</label>
+          <input type="text" name="title" class="form-control" placeholder="Ej: Pantalla rota iPhone 13" required>
+        </div>
+        <div class="form-group">
+          <label>Descripción Detallada</label>
+          <textarea name="description" class="form-control" rows="5" placeholder="Describe qué le pasó al dispositivo..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Información Adicional (Opcional)</label>
+          <textarea name="additional_info" class="form-control" rows="3" placeholder="Contraseñas, detalles técnicos, etc."></textarea>
+        </div>
+        <!-- En el futuro aquí iría la subida de archivos (multer + cloud storage) -->
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Crear Solicitud</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

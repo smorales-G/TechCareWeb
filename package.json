@@ -1,0 +1,29 @@
+{
+  "name": "techcareweb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "init_db.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smorales-G/TechCareWeb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smorales-G/TechCareWeb/issues"
+  },
+  "homepage": "https://github.com/smorales-G/TechCareWeb#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.2.0"
+  }
+}
