@@ -2,109 +2,310 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalle Solicitud — TechCare.mza</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Detalle de Solicitud — TechCare.mza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0e0e10; --surface:rgba(255,255,255,0.04); --surface-high:rgba(255,255,255,0.08);
+      --border:rgba(255,255,255,0.1); --cyan:#00f0ff; --cyan-dim:rgba(0,240,255,0.12);
+      --blue:#4a8eff; --green:#00e676; --red:#ff4444; --amber:#ffb300; --purple:#a47fff;
+      --text:#e5e1e4; --muted:#b9cacb; --font:'Geist',sans-serif; --mono:'Space Mono',monospace;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 15% 10%,rgba(0,240,255,.05) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 85% 80%,rgba(112,0,255,.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
+    nav{position:sticky;top:0;z-index:100;background:rgba(14,14,16,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;}
+    .nav-logo{font-size:1.2rem;font-weight:700;color:var(--cyan);letter-spacing:-.02em;}
+    .btn-back{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.4rem 1rem;border-radius:8px;text-decoration:none;font-size:.85rem;transition:all .2s;}
+    .btn-back:hover{border-color:rgba(0,240,255,.3);color:var(--cyan);}
+    main{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:1;}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;}
+    .page-title{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.3rem;}
+    .page-sub{font-family:var(--mono);font-size:.7rem;color:var(--muted);}
+    .layout{display:grid;grid-template-columns:1fr 380px;gap:1.5rem;align-items:start;}
+    @media(max-width:900px){.layout{grid-template-columns:1fr;}}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(20px);margin-bottom:1.25rem;overflow:hidden;}
+    .card-head{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.7rem;color:var(--cyan);letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;}
+    .card-head::before{content:'';width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px var(--cyan);}
+    .card-body{padding:1.25rem;}
+
+    /* STATUS */
+    .status{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.65rem;font-weight:700;padding:.3rem .75rem;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;}
+    .s-pendiente{background:rgba(255,179,0,.12);color:#ffb300;border:1px solid rgba(255,179,0,.3);}
+    .s-en_revision{background:rgba(74,142,255,.12);color:#4a8eff;border:1px solid rgba(74,142,255,.3);}
+    .s-en_coordinacion{background:rgba(0,240,255,.1);color:var(--cyan);border:1px solid rgba(0,240,255,.25);}
+    .s-en_recepcion{background:rgba(255,179,0,.12);color:#ffb300;border:1px solid rgba(255,179,0,.3);}
+    .s-en_diagnostico{background:rgba(112,0,255,.15);color:var(--purple);border:1px solid rgba(112,0,255,.3);}
+    .s-esperando_aprobacion{background:rgba(255,193,7,.12);color:#ffc107;border:1px solid rgba(255,193,7,.3);}
+    .s-en_reparacion{background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3);}
+    .s-esperando_repuestos{background:rgba(249,115,22,.15);color:#fb923c;border:1px solid rgba(249,115,22,.3);}
+    .s-listo_para_retiro{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3);}
+    .s-completado,.s-finalizado{background:rgba(100,116,139,.12);color:#94a3b8;border:1px solid rgba(100,116,139,.25);}
+    .s-cancelado,.s-cancelado_por_tecnico,.s-producto_no_recibido{background:rgba(255,68,68,.1);color:var(--red);border:1px solid rgba(255,68,68,.25);}
+
+    /* INFO GRID */
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+    .info-item label{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.05em;display:block;margin-bottom:.2rem;}
+    .info-item p{font-size:.9rem;color:var(--text);}
+    .desc-box{background:rgba(0,0,0,.2);border-radius:8px;padding:.9rem;color:var(--muted);font-size:.9rem;line-height:1.65;margin-top:.75rem;}
+
+    /* TECH MESSAGE */
+    .tech-msg-box{background:rgba(74,142,255,.08);border:1px solid rgba(74,142,255,.2);border-radius:10px;padding:1rem;}
+    .tech-msg-box p{font-size:.9rem;color:var(--text);line-height:1.6;}
+    .tech-msg-label{font-family:var(--mono);font-size:.65rem;color:var(--blue);margin-bottom:.4rem;}
+
+    /* DIAGNOSIS CARD */
+    .diag-box{background:rgba(0,0,0,.3);border-radius:10px;padding:1rem;margin-bottom:1rem;}
+    .diag-box p{font-size:.9rem;color:var(--muted);line-height:1.65;}
+    .price-big{font-family:var(--mono);font-size:1.8rem;font-weight:700;color:var(--green);text-shadow:0 0 20px rgba(0,230,118,.4);margin:.5rem 0 1rem;}
+
+    /* DECISION BUTTONS */
+    .decision-btns{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+    .btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.7rem 1rem;border-radius:10px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:all .25s;}
+    .btn-accept{background:var(--green);color:#000;}
+    .btn-accept:hover{box-shadow:0 0 24px rgba(0,230,118,.5);}
+    .btn-reject{background:rgba(255,68,68,.12);color:var(--red);border:1px solid rgba(255,68,68,.3);}
+    .btn-reject:hover{background:rgba(255,68,68,.22);}
+
+    /* STEPPER */
+    .stepper{display:flex;flex-direction:column;gap:0;}
+    .step{display:flex;align-items:flex-start;gap:.75rem;padding:.6rem 0;position:relative;}
+    .step:not(:last-child)::after{content:'';position:absolute;left:11px;top:30px;width:2px;height:calc(100% - 10px);background:var(--border);}
+    .step.done::after{background:var(--green);}
+    .step.active::after{background:var(--cyan);}
+    .step-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;background:var(--bg);position:relative;z-index:1;}
+    .step.done .step-dot{border-color:var(--green);background:rgba(0,230,118,.15);color:var(--green);}
+    .step.active .step-dot{border-color:var(--cyan);background:var(--cyan-dim);color:var(--cyan);box-shadow:0 0 12px rgba(0,240,255,.4);}
+    .step-label{font-size:.85rem;font-weight:500;color:var(--muted);padding-top:.15rem;}
+    .step.done .step-label{color:var(--text);}
+    .step.active .step-label{color:var(--cyan);font-weight:600;}
+    .step-sub{font-family:var(--mono);font-size:.65rem;color:var(--muted);opacity:.7;}
+
+    /* HISTORY */
+    .hist-item{padding:.6rem 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:.75rem;}
+    .hist-item:last-child{border-bottom:none;}
+    .hist-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);margin-top:.35rem;flex-shrink:0;}
+    .hist-label{font-size:.8rem;color:var(--text);font-weight:500;}
+    .hist-time{font-family:var(--mono);font-size:.65rem;color:var(--muted);}
+
+    /* CHAT */
+    .chat-window{display:flex;flex-direction:column;height:320px;}
+    .chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.6rem;padding:.25rem .1rem;margin-bottom:.75rem;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+    .msg{max-width:85%;padding:.6rem .9rem;border-radius:12px;font-size:.85rem;line-height:1.5;}
+    .msg.tech,.msg.bot{background:rgba(74,142,255,.12);border:1px solid rgba(74,142,255,.2);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
+    .msg.bot{background:rgba(0,240,255,.07);border-color:rgba(0,240,255,.2);}
+    .msg.client{background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text);align-self:flex-end;border-bottom-right-radius:4px;}
+    .msg-name{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-bottom:.25rem;}
+    .chat-form{display:flex;gap:.5rem;}
+    .chat-input{flex:1;background:rgba(0,0,0,.3);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:.85rem;padding:.55rem .85rem;border-radius:8px;outline:none;}
+    .chat-input:focus{border-color:var(--cyan);}
+    .chat-send{background:var(--cyan);color:#000;border:none;padding:.55rem 1rem;border-radius:8px;font-weight:700;cursor:pointer;font-size:.9rem;transition:box-shadow .2s;}
+    .chat-send:hover{box-shadow:0 0 16px rgba(0,240,255,.4);}
+
+    /* MEDIA */
+    .media-row{display:flex;gap:.5rem;flex-wrap:wrap;}
+    .media-thumb{width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/" class="logo">TechCare<span>.mza</span></a>
-    <div class="nav-links">
-      <a href="/client/dashboard" class="btn btn-secondary btn-sm">← Volver</a>
+<nav>
+  <span class="nav-logo">⚡ TechCare.mza</span>
+  <a href="/client/dashboard" class="btn-back">← Volver</a>
+</nav>
+
+<main>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Solicitud #<%= request.id %></h1>
+      <p class="page-sub">DISPOSITIVO_ID:<%= request.id %> // CREADO <%= new Date(request.created_at).toLocaleDateString('es-AR') %></p>
     </div>
-  </nav>
+    <span class="status s-<%= request.status %>"><%= request.status.replace(/_/g,' ') %></span>
+  </div>
 
-  <div class="container" style="max-width: 900px; margin: 0 auto;">
-    <!-- Header -->
-    <div class="page-header fade-up">
-      <div>
-        <p style="color:var(--text-2); font-size:0.85rem; margin-bottom:0.35rem;">Solicitud #<%= request.id %></p>
-        <h2><%= request.title %></h2>
-      </div>
-      <span class="badge <%= request.status %>"><%= request.status.replace(/_/g, ' ') %></span>
-    </div>
-
-    <div class="grid-2" style="gap:1.5rem;">
-      <!-- Columna izquierda: info -->
-      <div style="display:flex; flex-direction:column; gap:1.5rem;">
-
-        <!-- Descripción -->
-        <div class="glass-card fade-up">
-          <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--text-2);">📋 Descripción</h3>
-          <p style="font-size:0.95rem; line-height:1.7;"><%= request.description %></p>
-          <% if (request.additional_info) { %>
-            <hr style="border:0; border-top:1px solid var(--border); margin:1rem 0;">
-            <p style="font-size:0.85rem; color:var(--text-2);"><strong>Info técnica:</strong> <%= request.additional_info %></p>
+  <div class="layout">
+    <!-- COLUMNA IZQUIERDA -->
+    <div>
+      <!-- Info del dispositivo -->
+      <div class="card">
+        <div class="card-head">Información del dispositivo</div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item"><label>Tipo de dispositivo</label><p><%= request.device_type || '—' %></p></div>
+            <div class="info-item"><label>Estado</label><span class="status s-<%= request.status %>"><%= request.status.replace(/_/g,' ') %></span></div>
+          </div>
+          <div class="desc-box"><%= request.problem_description %></div>
+          <% if (media && media.length > 0) { %>
+          <div class="media-row" style="margin-top:.75rem">
+            <% media.forEach(m => { if(m.file_type?.startsWith('image')) { %>
+            <img src="<%= m.file_url %>" class="media-thumb" alt="Media">
+            <% } }) %>
+          </div>
           <% } %>
         </div>
+      </div>
 
-        <!-- Diagnóstico / Precio -->
-        <% if (request.diagnosis) { %>
-          <div class="glass-card fade-up" style="border-color: rgba(168,85,247,0.3);">
-            <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--purple);">🔍 Diagnóstico del técnico</h3>
-            <p style="font-size:0.95rem; line-height:1.7; margin-bottom:0.75rem;"><%= request.diagnosis %></p>
-            <% if (request.price) { %>
-              <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:0.75rem; display:inline-block;">
-                <span style="font-size:1.25rem; font-weight:900; color:var(--green);">$<%= Number(request.price).toLocaleString('es-AR') %></span>
-              </div>
-            <% } %>
-
-            <% if (request.status === 'en_diagnostico') { %>
-              <div style="margin-top:1.25rem; display:flex; gap:0.75rem;">
-                <form action="/client/request/<%= request.id %>/action" method="POST" style="flex:1;">
-                  <button type="submit" name="action" value="accept" class="btn btn-success" style="width:100%;">✅ Aceptar reparación</button>
-                </form>
-                <form action="/client/request/<%= request.id %>/action" method="POST" style="flex:1;">
-                  <button type="submit" name="action" value="decline" class="btn btn-danger" style="width:100%;">❌ Rechazar</button>
-                </form>
-              </div>
-            <% } %>
+      <!-- Respuesta del técnico -->
+      <% if (request.tech_response) { %>
+      <div class="card">
+        <div class="card-head">Mensaje del técnico</div>
+        <div class="card-body">
+          <div class="tech-msg-box">
+            <div class="tech-msg-label">🔧 TÉCNICO</div>
+            <p><%= request.tech_response %></p>
           </div>
-        <% } %>
+        </div>
+      </div>
+      <% } %>
 
-        <!-- Media adjunta -->
-        <% if (media && media.length > 0) { %>
-          <div class="glass-card fade-up">
-            <h3 style="font-size:1rem; margin-bottom:1rem; color:var(--text-2);">📎 Archivos adjuntos</h3>
-            <div class="media-grid">
-              <% media.forEach(m => { %>
-                <% const isVideo = m.media_url && (m.media_url.includes('.mp4') || m.media_url.includes('.mov') || m.media_url.includes('.webm')); %>
-                <% if (isVideo) { %>
-                  <video src="<%= m.media_url %>" class="media-thumb" controls muted></video>
-                <% } else { %>
-                  <img src="<%= m.media_url %>" class="media-thumb" alt="Adjunto" onclick="window.open(this.src,'_blank')">
-                <% } %>
+      <!-- Diagnóstico + decisión -->
+      <% if (['esperando_aprobacion','esperando_respuesta_cliente'].includes(request.status)) { %>
+      <div class="card" style="border-color:rgba(255,193,7,.3)">
+        <div class="card-head" style="color:#ffc107">📋 Diagnóstico técnico — Decisión requerida</div>
+        <div class="card-body">
+          <% if (request.diagnosis) { %>
+          <div class="diag-box"><p><%= request.diagnosis %></p></div>
+          <% } %>
+          <% if (request.price) { %>
+          <label style="font-family:var(--mono);font-size:.65rem;color:var(--muted)">PRESUPUESTO DE REPARACIÓN</label>
+          <div class="price-big">$<%= parseFloat(request.price).toLocaleString('es-AR') %></div>
+          <% } %>
+          <div class="decision-btns">
+            <form method="POST" action="/client/request/<%= request.id %>/action">
+              <input type="hidden" name="action" value="accept">
+              <button type="submit" class="btn btn-accept" style="width:100%">✅ Aceptar reparación</button>
+            </form>
+            <form method="POST" action="/client/request/<%= request.id %>/action">
+              <input type="hidden" name="action" value="reject">
+              <button type="submit" class="btn btn-reject" style="width:100%">❌ Rechazar presupuesto</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Chat -->
+      <div class="card">
+        <div class="card-head">Chat del servicio</div>
+        <div class="card-body">
+          <div class="chat-window">
+            <div class="chat-msgs" id="chatMsgs">
+              <% if (!messages || messages.length === 0) { %>
+              <div style="text-align:center;color:var(--muted);font-size:.8rem;padding:2rem 0">No hay mensajes aún. Iniciá la conversación.</div>
+              <% } %>
+              <% (messages || []).forEach(m => { %>
+              <div class="msg <%= m.sender_role %>">
+                <div class="msg-name"><%= m.sender_role === 'bot' ? '🤖 BOT' : m.sender_name?.toUpperCase() %></div>
+                <%= m.content %>
+              </div>
               <% }) %>
             </div>
+            <form class="chat-form" id="chatForm">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Escribí tu mensaje..." autocomplete="off">
+              <button type="submit" class="chat-send">➤</button>
+            </form>
           </div>
-        <% } %>
-
-      </div>
-
-      <!-- Columna derecha: historial timeline -->
-      <div class="glass-card fade-up" style="align-self:start;">
-        <h3 style="font-size:1rem; margin-bottom:1.5rem; color:var(--text-2);">🕐 Historial de estados</h3>
-        <% if (history && history.length > 0) { %>
-          <div class="timeline">
-            <% history.forEach((h, i) => { %>
-              <div class="timeline-item">
-                <div class="timeline-left">
-                  <div class="timeline-dot" style="background:<%= i === 0 ? 'var(--accent)' : 'var(--text-3)' %>"></div>
-                  <div class="timeline-line"></div>
-                </div>
-                <div class="timeline-content">
-                  <div class="tl-status"><span class="badge <%= h.status %>" style="font-size:0.7rem;"><%= h.status.replace(/_/g, ' ') %></span></div>
-                  <% if (h.notes) { %><div class="tl-notes" style="margin-top:0.4rem;"><%= h.notes %></div><% } %>
-                  <div class="tl-date">📅 <%= new Date(h.created_at).toLocaleDateString('es-AR', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) %></div>
-                </div>
-              </div>
-            <% }) %>
-          </div>
-        <% } else { %>
-          <p style="color:var(--text-3); font-size:0.9rem;">Sin historial registrado.</p>
-        <% } %>
+        </div>
       </div>
     </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div>
+      <!-- STEPPER de progreso -->
+      <div class="card">
+        <div class="card-head">Progreso del servicio</div>
+        <div class="card-body">
+          <%
+          const STEPS = [
+            {key:'pendiente', label:'Solicitud creada', sub:'Ticket generado'},
+            {key:'en_revision', label:'Revisión inicial', sub:'1-4 hs laborables'},
+            {key:'en_coordinacion', label:'Coordinación de ingreso', sub:'12-24 hs'},
+            {key:'en_recepcion', label:'Recepción del dispositivo', sub:'15-30 min'},
+            {key:'en_diagnostico', label:'En diagnóstico', sub:'24-48 hs'},
+            {key:'esperando_aprobacion', label:'Decisión del cliente', sub:'1-3 días'},
+            {key:'en_reparacion', label:'En reparación', sub:'1-5 días'},
+            {key:'listo_para_retiro', label:'Listo para retiro', sub:'Coordiná pago'},
+            {key:'completado', label:'Completado', sub:'Servicio finalizado'},
+          ];
+          const ORDER = STEPS.map(s => s.key);
+          const curIdx = ORDER.indexOf(request.status);
+          %>
+          <div class="stepper">
+            <% STEPS.forEach((step, i) => { %>
+            <%
+              let cls = '';
+              if (i < curIdx) cls = 'done';
+              else if (step.key === request.status) cls = 'active';
+            %>
+            <div class="step <%= cls %>">
+              <div class="step-dot"><% if(cls==='done'){ %>✓<% } else if(cls==='active'){ %>●<% } %></div>
+              <div>
+                <div class="step-label"><%= step.label %></div>
+                <div class="step-sub"><%= step.sub %></div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historial -->
+      <% if (history && history.length > 0) { %>
+      <div class="card">
+        <div class="card-head">Historial de cambios</div>
+        <div class="card-body" style="max-height:280px;overflow-y:auto">
+          <% history.forEach(h => { %>
+          <div class="hist-item">
+            <div class="hist-dot"></div>
+            <div>
+              <div class="hist-label"><%= h.notes || h.status %></div>
+              <div class="hist-time"><%= new Date(h.created_at).toLocaleString('es-AR') %></div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+    </div>
   </div>
+</main>
+
+<script>
+  const reqId = <%= request.id %>;
+  const chatMsgs = document.getElementById('chatMsgs');
+  const chatInput = document.getElementById('chatInput');
+
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+  document.getElementById('chatForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const content = chatInput.value.trim();
+    if (!content) return;
+    chatInput.value = '';
+    try {
+      await fetch(`/request/${reqId}/message`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ content })
+      });
+      loadMessages();
+    } catch(err) { console.error(err); }
+  });
+
+  async function loadMessages() {
+    try {
+      const res = await fetch(`/request/${reqId}/messages`);
+      const msgs = await res.json();
+      chatMsgs.innerHTML = msgs.map(m => `
+        <div class="msg ${m.sender_role}">
+          <div class="msg-name">${m.sender_role === 'bot' ? '🤖 BOT' : (m.sender_name || m.sender_role).toUpperCase()}</div>
+          ${m.content}
+        </div>
+      `).join('') || '<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:2rem 0">Sin mensajes.</div>';
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    } catch(e) {}
+  }
+
+  setInterval(loadMessages, 8000);
+</script>
 </body>
 </html>

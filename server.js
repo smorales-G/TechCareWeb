@@ -225,14 +225,16 @@ app.get('/client/request/:id', requireAuth, async (req, res) => {
     const history = await SpiderApi.query(
       `SELECT * FROM history WHERE request_id = ${reqId} ORDER BY created_at DESC`
     );
-    const media = await SpiderApi.query(
-      `SELECT * FROM request_media WHERE request_id = ${reqId}`
+    const media = await SpiderApi.query(`SELECT * FROM request_media WHERE request_id = ${reqId}`);
+    const messages = await SpiderApi.query(
+      `SELECT m.*, u.username as sender_name FROM messages m JOIN users u ON m.sender_id = u.id WHERE m.request_id = ${reqId} ORDER BY m.created_at ASC`
     );
 
     res.render('request_detail', {
       request: reqs[0],
       history: history || [],
-      media: media || []
+      media: media || [],
+      messages: messages || []
     });
   } catch (err) {
     console.error('Request detail error:', err);
@@ -240,16 +242,26 @@ app.get('/client/request/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Acción cliente: aceptar o rechazar diagnóstico
+// Acción cliente: aceptar o rechazar presupuesto (esperando_aprobacion → en_reparacion | cancelado)
 app.post('/client/request/:id/action', requireAuth, async (req, res) => {
   try {
     const { action } = req.body;
     const reqId = req.params.id;
-    const newStatus = action === 'accept' ? 'reparacion_aceptada' : 'en_proceso_de_devolucion';
-    const notes = action === 'accept' ? 'El cliente aceptó el presupuesto.' : 'El cliente rechazó el presupuesto.';
+    const clientId = req.session.user.id;
 
-    await SpiderApi.query(`UPDATE requests SET status = '${newStatus}' WHERE id = ${reqId} AND client_id = ${req.session.user.id}`);
+    const reqs = await SpiderApi.query(
+      `SELECT * FROM requests WHERE id = ${reqId} AND client_id = ${clientId} AND status IN ('esperando_aprobacion','esperando_respuesta_cliente')`
+    );
+    if (!reqs || reqs.length === 0) return res.status(403).send('Acción no permitida en este estado.');
+
+    const newStatus = action === 'accept' ? 'en_reparacion' : 'cancelado';
+    const notes = action === 'accept'
+      ? 'El cliente aceptó el presupuesto. Dispositivo en reparación.'
+      : 'El cliente rechazó el presupuesto. Solicitud cancelada.';
+
+    await SpiderApi.query(`UPDATE requests SET status = '${newStatus}' WHERE id = ${reqId}`);
     await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, '${newStatus}', '${notes}')`);
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${clientId}, 'client', '${notes}')`);
 
     res.redirect('/client/dashboard');
   } catch (err) {
@@ -260,48 +272,254 @@ app.post('/client/request/:id/action', requireAuth, async (req, res) => {
 
 // ================= Tech Routes =================
 
+// Estados activos y cerrados del flujo optimizado v2
+const ACTIVE_STATUSES = `'pendiente','en_revision','en_coordinacion','en_recepcion','en_diagnostico','esperando_aprobacion','en_reparacion','esperando_repuestos','listo_para_retiro'`;
+const CLOSED_STATUSES = `'completado','cancelado','cancelado_por_tecnico','producto_no_recibido','finalizado'`;
+
+// Tiempos estimados por estado
+const ESTIMATED_TIMES = {
+  pendiente: 'Inmediato',
+  en_revision: '1 a 4 horas laborables',
+  en_coordinacion: '12 a 24 horas',
+  en_recepcion: '15 a 30 minutos',
+  en_diagnostico: '24 a 48 horas',
+  esperando_aprobacion: '1 a 3 días',
+  en_reparacion: '1 a 5 días',
+  esperando_repuestos: 'Variable (pendiente de componentes)',
+  listo_para_retiro: 'Retiro inmediato',
+  completado: 'Cerrado',
+};
+
 app.get('/tech/dashboard', requireTech, async (req, res) => {
   try {
+    const { filter } = req.query;
+    let whereClause = '';
+    if (filter === 'active') whereClause = `WHERE r.status IN (${ACTIVE_STATUSES})`;
+    else if (filter === 'closed') whereClause = `WHERE r.status IN (${CLOSED_STATUSES})`;
+
     const requests = await SpiderApi.query(`
-      SELECT r.*, u.username as client_name
+      SELECT r.*, u.username as client_name, u.email as client_email
       FROM requests r
       JOIN users u ON r.client_id = u.id
-      ORDER BY r.created_at DESC
+      ${whereClause}
+      ORDER BY FIELD(r.status,'pendiente','en_revision','en_coordinacion','en_recepcion','en_diagnostico','esperando_aprobacion','en_reparacion','esperando_repuestos','listo_para_retiro'), r.created_at DESC
     `);
 
-    // Obtener media para cada solicitud
     const requestsWithMedia = await Promise.all((requests || []).map(async r => {
       try {
         const media = await SpiderApi.query(`SELECT * FROM request_media WHERE request_id = ${r.id}`);
-        return { ...r, media: media || [] };
-      } catch { return { ...r, media: [] }; }
+        const lastMsg = await SpiderApi.query(`SELECT * FROM messages WHERE request_id = ${r.id} ORDER BY created_at DESC LIMIT 1`);
+        return { ...r, media: media || [], lastMsg: lastMsg?.[0] || null, estimatedTime: ESTIMATED_TIMES[r.status] || '' };
+      } catch { return { ...r, media: [], lastMsg: null, estimatedTime: '' }; }
     }));
 
-    res.render('tech_dashboard', { requests: requestsWithMedia });
+    res.render('tech_dashboard', { requests: requestsWithMedia, filter: filter || 'all', ESTIMATED_TIMES });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error al cargar el panel técnico.');
   }
 });
 
-app.post('/tech/request/:id/status', requireTech, async (req, res) => {
+// ESTADO 2: Técnico acepta → en_revision (pendiente → en_revision)
+app.post('/tech/request/:id/accept', requireTech, async (req, res) => {
   try {
     const reqId = req.params.id;
-    const { status, diagnosis, price, notes } = req.body;
+    const { tech_response } = req.body;
+    const techId = req.session.user.id;
+    const response = (tech_response || '').replace(/'/g, "''");
+    if (!response) return res.status(400).send('El mensaje es obligatorio.');
 
-    let updates = `status = '${status}'`;
-    if (diagnosis) updates += `, diagnosis = '${diagnosis.replace(/'/g,"''")}'`;
-    if (price) updates += `, price = ${parseFloat(price)}`;
-
-    await SpiderApi.query(`UPDATE requests SET ${updates} WHERE id = ${reqId}`);
     await SpiderApi.query(
-      `INSERT INTO history (request_id, status, notes) VALUES (${reqId}, '${status}', '${(notes||'Estado actualizado por el técnico').replace(/'/g,"''")}')`
+      `UPDATE requests SET status = 'en_revision', tech_response = '${response}', assigned_tech_id = ${techId} WHERE id = ${reqId} AND status = 'pendiente'`
     );
-
+    await SpiderApi.query(
+      `INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'en_revision', 'Técnico inició revisión: ${response}')`
+    );
+    // Mensaje automático en el chat
+    await SpiderApi.query(
+      `INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'technician', '${response}')`
+    );
     res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 2b: Técnico cancela (pendiente → cancelado)
+app.post('/tech/request/:id/cancel', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { tech_response } = req.body;
+    const techId = req.session.user.id;
+    const response = (tech_response || 'La solicitud no puede ser atendida en este momento.').replace(/'/g, "''");
+
+    await SpiderApi.query(
+      `UPDATE requests SET status = 'cancelado', tech_response = '${response}' WHERE id = ${reqId} AND status = 'pendiente'`
+    );
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'cancelado', 'Solicitud cancelada: ${response}')`);
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'technician', 'Lamentamos informarte que tu solicitud fue cancelada: ${response}')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 3: Técnico confirma coordinación (en_revision → en_coordinacion)
+app.post('/tech/request/:id/coordinate', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { notes } = req.body;
+    const techId = req.session.user.id;
+    const notesVal = (notes || 'Solicitud aceptada. Coordinemos la entrega del dispositivo.').replace(/'/g, "''");
+
+    await SpiderApi.query(`UPDATE requests SET status = 'en_coordinacion' WHERE id = ${reqId} AND status = 'en_revision'`);
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'en_coordinacion', '${notesVal}')`);
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'technician', '${notesVal}')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 4a: Técnico marca producto como recibido (en_coordinacion → en_recepcion)
+app.post('/tech/request/:id/arrived', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { notes } = req.body;
+    const techId = req.session.user.id;
+    const notesVal = (notes || 'Dispositivo recibido en el taller. Registrando estado físico.').replace(/'/g, "''");
+
+    await SpiderApi.query(`UPDATE requests SET status = 'en_recepcion' WHERE id = ${reqId} AND status = 'en_coordinacion'`);
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'en_recepcion', '${notesVal}')`);
+    // Mensaje automático al cliente
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'bot', '✅ Hemos recibido tu equipo y está en la fila de diagnóstico. Te notificaremos cuando tengamos el informe.')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 4b: Inicio de diagnóstico (en_recepcion → en_diagnostico)
+app.post('/tech/request/:id/start-diagnosis', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { notes } = req.body;
+    const notesVal = (notes || 'Dispositivo en diagnóstico técnico.').replace(/'/g, "''");
+
+    await SpiderApi.query(`UPDATE requests SET status = 'en_diagnostico' WHERE id = ${reqId} AND status = 'en_recepcion'`);
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'en_diagnostico', '${notesVal}')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 4c: No recibido/cancelado (en_coordinacion → cancelado)
+app.post('/tech/request/:id/not-received', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { notes } = req.body;
+    const techId = req.session.user.id;
+    const notesVal = (notes || 'El cliente no entregó el dispositivo. Solicitud cancelada.').replace(/'/g, "''");
+
+    await SpiderApi.query(`UPDATE requests SET status = 'cancelado' WHERE id = ${reqId} AND status IN ('en_coordinacion','en_recepcion')`);
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'cancelado', '${notesVal}')`);
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'technician', '${notesVal}')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 5: Técnico envía diagnóstico (en_diagnostico → esperando_aprobacion)
+app.post('/tech/request/:id/diagnosis', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { diagnosis, price, notes } = req.body;
+    const techId = req.session.user.id;
+    if (!diagnosis || !price) return res.status(400).send('Diagnóstico y precio son obligatorios.');
+
+    const diagVal = diagnosis.replace(/'/g, "''");
+    const notesVal = (notes || `Diagnóstico completo. Presupuesto: $${price}.`).replace(/'/g, "''");
+
+    await SpiderApi.query(
+      `UPDATE requests SET status = 'esperando_aprobacion', diagnosis = '${diagVal}', price = ${parseFloat(price)} WHERE id = ${reqId} AND status = 'en_diagnostico'`
+    );
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'esperando_aprobacion', '${notesVal}')`);
+    const priceFormatted = parseFloat(price).toLocaleString('es-AR');
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'technician', 'Diagnostico listo: ${diagVal}. Presupuesto: $${priceFormatted}. Acepta continuar con la reparacion?')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error al cargar el diagnóstico.'); }
+});
+
+// ESTADO 7: Técnico marca como en reparación (esperando_aprobacion/en_reparacion pueden coexistir)
+// Este endpoint lo activa el sistema al aceptar el cliente (ver cliente routes)
+
+// ESTADO 7b: Sub-estado esperando repuestos (en_reparacion → esperando_repuestos)
+app.post('/tech/request/:id/waiting-parts', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { notes } = req.body;
+    const techId = req.session.user.id;
+    const notesVal = (notes || 'En espera de repuestos o componentes para continuar.').replace(/'/g, "''");
+
+    await SpiderApi.query(`UPDATE requests SET status = 'esperando_repuestos' WHERE id = ${reqId} AND status = 'en_reparacion'`);
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'esperando_repuestos', '${notesVal}')`);
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'technician', '⏳ Actualización: ${notesVal}')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 8: Reparación completada, listo para retiro (en_reparacion|esperando_repuestos → listo_para_retiro)
+app.post('/tech/request/:id/repaired', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { notes } = req.body;
+    const techId = req.session.user.id;
+    const notesVal = (notes || 'Reparación completada y testeada. Dispositivo listo para retirar.').replace(/'/g, "''");
+
+    await SpiderApi.query(`UPDATE requests SET status = 'listo_para_retiro' WHERE id = ${reqId} AND status IN ('en_reparacion','esperando_repuestos')`);
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'listo_para_retiro', '${notesVal}')`);
+    await SpiderApi.query(`INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${techId}, 'bot', '🎉 ¡Excelente noticia! Tu dispositivo está reparado y listo para retirar. Coordiná con nosotros el horario y el pago final.')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ESTADO 9: Técnico confirma entrega final (listo_para_retiro → completado)
+app.post('/tech/request/:id/delivered', requireTech, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { notes } = req.body;
+    const notesVal = (notes || 'Dispositivo entregado al cliente. Servicio completado y cobrado.').replace(/'/g, "''");
+
+    await SpiderApi.query(`UPDATE requests SET status = 'completado' WHERE id = ${reqId} AND status IN ('listo_para_retiro','en_negociacion_devolucion','finalizado','en_devolucion')`);
+    await SpiderApi.query(`INSERT INTO history (request_id, status, notes) VALUES (${reqId}, 'completado', '${notesVal}')`);
+    res.redirect('/tech/dashboard');
+  } catch (err) { console.error(err); res.status(500).send('Error.'); }
+});
+
+// ================= Chat API =================
+
+// GET: obtener mensajes de una solicitud
+app.get('/request/:id/messages', requireAuth, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const msgs = await SpiderApi.query(
+      `SELECT m.*, u.username as sender_name FROM messages m JOIN users u ON m.sender_id = u.id WHERE m.request_id = ${reqId} ORDER BY m.created_at ASC`
+    );
+    res.json(msgs || []);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error al actualizar el estado.');
+    res.status(500).json([]);
+  }
+});
+
+// POST: enviar mensaje en el chat de una solicitud
+app.post('/request/:id/message', requireAuth, async (req, res) => {
+  try {
+    const reqId = req.params.id;
+    const { content } = req.body;
+    const senderId = req.session.user.id;
+    const senderRole = req.session.user.role === 'technician' ? 'technician' : 'client';
+
+    if (!content || !content.trim()) return res.status(400).json({ error: 'Mensaje vacío.' });
+
+    const safeContent = content.trim().replace(/'/g, "''");
+    await SpiderApi.query(
+      `INSERT INTO messages (request_id, sender_id, sender_role, content) VALUES (${reqId}, ${senderId}, '${senderRole}', '${safeContent}')`
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al enviar mensaje.' });
   }
 });
 
