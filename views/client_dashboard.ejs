@@ -2,56 +2,96 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Client Dashboard - TechCare.mza</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Mis Solicitudes — TechCare.mza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/client-dash.css">
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/" class="logo">TechCare<span>.mza</span></a>
-    <div class="nav-links">
-      <span style="color: var(--text-muted); margin-right: 20px;">Hola, <%= user.username %></span>
-      <a href="/logout" class="btn btn-secondary">Cerrar Sesión</a>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-      <h2>Mis Solicitudes</h2>
-      <a href="/client/request/new" class="btn">+ Nueva Solicitud</a>
-    </div>
-
-    <div class="grid">
-      <% if (requests.length === 0) { %>
-        <p style="color: var(--text-muted);">No tienes solicitudes activas. Crea una nueva.</p>
-      <% } else { %>
-        <% requests.forEach(r => { %>
-          <div class="glass-card">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-              <h3 style="color: #fff;"><%= r.title %></h3>
-              <span class="badge <%= r.status %>"><%= r.status.replace(/_/g, ' ') %></span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-              <%= r.description.substring(0, 80) %>...
-            </p>
-            
-            <% if (r.status === 'en_diagnostico') { %>
-              <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <p><strong>Diagnóstico:</strong> <%= r.diagnosis %></p>
-                <p><strong>Precio:</strong> $<%= r.price %></p>
-              </div>
-              <form action="/client/request/<%= r.id %>/action" method="POST" style="display: flex; gap: 10px;">
-                <button type="submit" name="action" value="accept" class="btn" style="background: #22c55e; flex: 1;">Aceptar</button>
-                <button type="submit" name="action" value="decline" class="btn btn-secondary" style="border-color: #ef4444; color: #ef4444; flex: 1;">Rechazar</button>
-              </form>
-            <% } %>
-
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
-              Creado: <%= new Date(r.created_at).toLocaleDateString() %>
-            </div>
-          </div>
-        <% }) %>
-      <% } %>
-    </div>
+<nav>
+  <span class="nav-logo"><i class="fa-solid fa-bolt"></i> TechCare.mza</span>
+  <div class="nav-right">
+    <a href="/client/request/new" class="btn-new"><i class="fa-solid fa-plus"></i> Nueva Solicitud</a>
+    <a href="/logout" class="btn-nav">Salir</a>
   </div>
+</nav>
+
+<main>
+  <h1>Mis Solicitudes</h1>
+  <p class="subtitle">PANEL_CLIENTE // <%= new Date().toLocaleDateString('es-AR') %></p>
+
+  <div class="cards">
+    <% if (!requests || requests.length === 0) { %>
+    <div class="empty">
+      <div class="empty-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+      <p>No tenés solicitudes todavía.</p>
+      <a href="/client/request/new" class="btn btn-detail" style="margin-top:1rem;display:inline-flex"><i class="fa-solid fa-plus"></i> Crear tu primera solicitud</a>
+    </div>
+    <% } %>
+
+    <% requests.forEach(req => {
+      const ORDER = ['pendiente','en_revision','en_coordinacion','en_recepcion','en_diagnostico','esperando_aprobacion','en_reparacion','esperando_repuestos','listo_para_retiro','completado'];
+      const idx = ORDER.indexOf(req.status);
+      const pct = idx < 0 ? 0 : Math.round((idx / (ORDER.length - 1)) * 100);
+      const needsAction = ['esperando_aprobacion','esperando_respuesta_cliente'].includes(req.status);
+      const isClosed = ['completado','cancelado','cancelado_por_tecnico','finalizado','producto_no_recibido'].includes(req.status);
+    %>
+    <div class="card" style="<%= needsAction ? 'border-color:rgba(255,193,7,.35)' : '' %>">
+      <div class="card-header">
+        <div>
+          <div class="card-title"><%= req.device_type %></div>
+          <div class="card-meta">Ticket #<%= req.id %> · <%= new Date(req.created_at).toLocaleDateString('es-AR') %></div>
+        </div>
+        <span class="status s-<%= req.status %>"><%= req.status.replace(/_/g,' ') %></span>
+      </div>
+      <div class="card-body">
+
+        <% if (!isClosed) { %>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" style="width:<%= pct %>%"></div></div>
+          <div class="progress-label">Paso <%= Math.max(1,idx+1) %> de 9 — <%= req.status.replace(/_/g,' ') %></div>
+        </div>
+        <% } %>
+
+        <% if (needsAction) { %>
+        <div class="notify">
+          <i class="fa-solid fa-triangle-exclamation"></i> <strong>Acción requerida:</strong> El técnico cargó el diagnóstico. Revisá el presupuesto.
+        </div>
+        <% } %>
+
+        <% if (req.status === 'listo_para_retiro') { %>
+        <div class="notify" style="background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.3);color:var(--green)">
+          <i class="fa-solid fa-champagne-glasses"></i> <strong>¡Tu equipo está listo!</strong> Podés pasar a retirarlo al taller.
+        </div>
+        <% } %>
+
+        <p class="desc"><%= req.problem_description?.substring(0,120) %><%= req.problem_description?.length > 120 ? '...' : '' %></p>
+
+        <% if (req.tech_response) { %>
+        <div class="last-msg">
+          <strong><i class="fa-solid fa-message"></i> TÉCNICO</strong><%= req.tech_response?.substring(0,100) %>...
+        </div>
+        <% } %>
+
+        <div class="btn-actions">
+          <a href="/client/request/<%= req.id %>" class="btn btn-detail"><i class="fa-solid fa-eye"></i> Ver detalle y chat</a>
+
+          <% if (needsAction) { %>
+          <form method="POST" action="/client/request/<%= req.id %>/action" style="display:inline">
+            <input type="hidden" name="action" value="accept">
+            <button type="submit" class="btn btn-accept"><i class="fa-solid fa-check"></i> Aceptar presupuesto</button>
+          </form>
+          <form method="POST" action="/client/request/<%= req.id %>/action" style="display:inline">
+            <input type="hidden" name="action" value="reject">
+            <button type="submit" class="btn btn-reject"><i class="fa-solid fa-xmark"></i> Rechazar</button>
+          </form>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+</main>
 </body>
 </html>
