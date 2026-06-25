@@ -2,57 +2,90 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard - TechCare.mza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — TechCare.mza</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <nav class="navbar">
-    <a href="/" class="logo">TechCare<span>.mza</span> <small style="color:#a855f7; font-size:0.8rem;">[Admin Panel]</small></a>
+    <a href="/" class="logo">TechCare<span>.mza</span> <small style="color:var(--purple); font-size:0.7rem; font-weight:700;">[ADMIN]</small></a>
     <div class="nav-links">
-      <span style="color: var(--text-muted); margin-right: 20px;">Admin: <%= user.username %></span>
-      <a href="/logout" class="btn btn-secondary">Cerrar Sesión</a>
+      <div class="avatar-placeholder" style="background:linear-gradient(135deg,var(--purple),var(--accent-2));" title="<%= user.username %>">
+        <%= user.username.charAt(0).toUpperCase() %>
+      </div>
+      <span style="color:var(--text-2); font-size:0.9rem;"><%= user.username %></span>
+      <a href="/logout" class="btn btn-secondary btn-sm">Salir</a>
     </div>
   </nav>
 
   <div class="container">
-    <h2 style="margin-bottom: 2rem;">Gestión de Usuarios</h2>
+    <div class="page-header">
+      <div>
+        <h2>Gestión de Usuarios</h2>
+        <p style="color:var(--text-2); font-size:0.9rem; margin-top:0.25rem;"><%= users.length %> usuario(s) registrados</p>
+      </div>
+    </div>
 
-    <div class="glass-card" style="padding: 0; overflow: hidden;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left;">
-        <thead style="background: rgba(0,0,0,0.3);">
+    <!-- Stats row -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:1rem; margin-bottom:2rem;">
+      <div class="glass-card" style="padding:1.25rem; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:900; color:var(--accent);"><%= users.filter(u=>u.role==='client').length %></div>
+        <div style="font-size:0.8rem; color:var(--text-2); margin-top:0.3rem;">Clientes</div>
+      </div>
+      <div class="glass-card" style="padding:1.25rem; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:900; color:var(--red);"><%= users.filter(u=>u.role==='technician').length %></div>
+        <div style="font-size:0.8rem; color:var(--text-2); margin-top:0.3rem;">Técnicos</div>
+      </div>
+      <div class="glass-card" style="padding:1.25rem; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:900; color:var(--purple);"><%= users.filter(u=>u.role==='admin').length %></div>
+        <div style="font-size:0.8rem; color:var(--text-2); margin-top:0.3rem;">Admins</div>
+      </div>
+    </div>
+
+    <div class="glass-card" style="padding:0; overflow:hidden;">
+      <table class="data-table">
+        <thead>
           <tr>
-            <th style="padding: 1rem; color: var(--text-muted);">ID</th>
-            <th style="padding: 1rem; color: var(--text-muted);">Usuario</th>
-            <th style="padding: 1rem; color: var(--text-muted);">Email</th>
-            <th style="padding: 1rem; color: var(--text-muted);">Rol</th>
-            <th style="padding: 1rem; color: var(--text-muted);">Acciones</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol actual</th>
+            <th>Registro</th>
+            <th>Cambiar rol</th>
           </tr>
         </thead>
         <tbody>
           <% if (users.length === 0) { %>
-            <tr>
-              <td colspan="5" style="padding: 1rem; text-align: center; color: var(--text-muted);">No hay usuarios registrados.</td>
-            </tr>
+            <tr><td colspan="5" style="text-align:center; color:var(--text-2);">Sin usuarios registrados</td></tr>
           <% } else { %>
             <% users.forEach(u => { %>
-              <tr style="border-bottom: 1px solid var(--glass-border);">
-                <td style="padding: 1rem;"><%= u.id %></td>
-                <td style="padding: 1rem;"><%= u.username %></td>
-                <td style="padding: 1rem;"><%= u.email %></td>
-                <td style="padding: 1rem;">
+              <tr>
+                <td>
+                  <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <% if (u.profile_picture) { %>
+                      <img src="<%= u.profile_picture %>" class="avatar" style="width:32px;height:32px;" alt="<%= u.username %>">
+                    <% } else { %>
+                      <div class="avatar-placeholder" style="width:32px;height:32px;font-size:0.8rem;"><%= u.username.charAt(0).toUpperCase() %></div>
+                    <% } %>
+                    <span style="font-weight:600;"><%= u.username %></span>
+                  </div>
+                </td>
+                <td style="color:var(--text-2);"><%= u.email %></td>
+                <td>
                   <span class="badge" style="
-                    background: <%= u.role === 'admin' ? '#a855f7' : (u.role === 'technician' ? '#ef4444' : '#3b82f6') %>;
-                    color: white;
+                    background:<%= u.role==='admin'?'rgba(168,85,247,0.15)':u.role==='technician'?'rgba(239,68,68,0.15)':'rgba(59,130,246,0.15)' %>;
+                    color:<%= u.role==='admin'?'var(--purple)':u.role==='technician'?'var(--red)':'var(--accent)' %>;
+                    border:1px solid <%= u.role==='admin'?'rgba(168,85,247,0.3)':u.role==='technician'?'rgba(239,68,68,0.3)':'rgba(59,130,246,0.3)' %>;
                   "><%= u.role.toUpperCase() %></span>
                 </td>
-                <td style="padding: 1rem;">
-                  <form action="/admin/user/<%= u.id %>/role" method="POST" style="display: flex; gap: 10px;">
-                    <select name="role" class="form-control" style="padding: 0.5rem; min-width: 120px;">
-                      <option value="client" <%= u.role === 'client' ? 'selected' : '' %>>Client</option>
-                      <option value="technician" <%= u.role === 'technician' ? 'selected' : '' %>>Technician</option>
-                      <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                <td style="color:var(--text-3); font-size:0.85rem;"><%= new Date(u.created_at).toLocaleDateString('es-AR') %></td>
+                <td>
+                  <form action="/admin/user/<%= u.id %>/role" method="POST" style="display:flex; gap:0.5rem; align-items:center;">
+                    <select name="role" class="form-control" style="padding:0.4rem 0.75rem; min-width:130px; font-size:0.85rem;">
+                      <option value="client"     <%= u.role==='client'     ?'selected':'' %>>Cliente</option>
+                      <option value="technician" <%= u.role==='technician' ?'selected':'' %>>Técnico</option>
+                      <option value="admin"      <%= u.role==='admin'      ?'selected':'' %>>Admin</option>
                     </select>
-                    <button type="submit" class="btn" style="padding: 0.5rem 1rem;">Guardar</button>
+                    <button type="submit" class="btn btn-sm">Guardar</button>
                   </form>
                 </td>
               </tr>

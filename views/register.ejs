@@ -2,43 +2,92 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro - TechCare.mza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Cuenta — TechCare.mza</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <nav class="navbar">
     <a href="/" class="logo">TechCare<span>.mza</span></a>
   </nav>
 
-  <div class="container">
-    <div class="auth-container glass-card">
-      <h2 style="margin-bottom: 1.5rem; text-align: center;">Crear Cuenta</h2>
+  <div class="auth-wrapper">
+    <div class="auth-box glass-card fade-up">
+      <div style="text-align:center; margin-bottom:2rem;">
+        <div style="font-size:2.5rem; margin-bottom:0.75rem;"><i class="fa-solid fa-rocket"></i></div>
+        <h2>Crear cuenta</h2>
+        <p class="subtitle">Registrate y empezá a gestionar tus reparaciones</p>
+      </div>
+
       <% if (error) { %>
-        <p style="color: #ef4444; margin-bottom: 1rem; text-align: center;"><%= error %></p>
+        <div class="error-msg"><i class="fa-solid fa-triangle-exclamation"></i> <%= error %></div>
       <% } %>
-      <form action="/register" method="POST">
+
+      <form action="/register" method="POST" enctype="multipart/form-data" id="register-form">
+        <!-- Foto de perfil -->
         <div class="form-group">
-          <label>Nombre de Usuario</label>
-          <input type="text" name="username" class="form-control" required>
+          <label>Foto de perfil <span style="color:var(--text-3); font-weight:400;">(opcional)</span></label>
+          <div class="avatar-preview-wrapper">
+            <img id="avatar-preview" class="avatar-preview" src="" alt="Vista previa">
+            <label class="file-input-label" style="flex:1;">
+              <span><i class="fa-solid fa-camera"></i></span>
+              <span id="file-label-text">Seleccionar imagen...</span>
+              <input type="file" name="profile_picture" id="profile-pic-input" accept="image/*" onchange="previewAvatar(event)">
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="username">Nombre de usuario</label>
+          <input type="text" id="username" name="username" class="form-control" placeholder="Tu nombre o apodo" required>
         </div>
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" name="email" class="form-control" required>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="tu@email.com" required autocomplete="email">
         </div>
         <div class="form-group">
-          <label>Contraseña</label>
-          <input type="password" name="password" class="form-control" required>
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6">
         </div>
         <div class="form-group">
-          <label>Código Secreto (Opcional)</label>
-          <input type="text" name="tech_code" class="form-control" placeholder="Técnico / Admin">
+          <label for="tech_code">Código especial <span style="color:var(--text-3); font-weight:400;">(solo técnicos/admin)</span></label>
+          <input type="text" id="tech_code" name="tech_code" class="form-control" placeholder="Dejar vacío si sos cliente">
         </div>
-        <button type="submit" class="btn" style="width: 100%;">Registrarse</button>
+
+        <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;" id="submit-btn">
+          Crear cuenta
+        </button>
       </form>
-      <p style="margin-top: 1.5rem; text-align: center; color: var(--text-muted);">
-        ¿Ya tienes cuenta? <a href="/login" style="color: var(--accent-color);">Inicia Sesión</a>
+
+      <div class="divider">o</div>
+
+      <p style="text-align:center; font-size:0.9rem; color:var(--text-2);">
+        ¿Ya tenés cuenta? <a href="/login" style="color:var(--accent); font-weight:700;">Iniciar sesión</a>
       </p>
     </div>
   </div>
+
+  <script>
+    function previewAvatar(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const preview = document.getElementById('avatar-preview');
+      const label = document.getElementById('file-label-text');
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.classList.add('visible');
+        label.textContent = file.name;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('register-form').addEventListener('submit', function() {
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = 'Creando cuenta...';
+      btn.disabled = true;
+    });
+  </script>
 </body>
 </html>

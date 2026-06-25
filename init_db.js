@@ -24,7 +24,7 @@ async function init() {
       password VARCHAR(255) NOT NULL,
       email VARCHAR(100) NOT NULL UNIQUE,
       profile_picture VARCHAR(255),
-      role ENUM('client', 'technician') DEFAULT 'client',
+      role ENUM('client', 'technician', 'admin') DEFAULT 'client',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
