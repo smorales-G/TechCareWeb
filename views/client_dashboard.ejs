@@ -6,77 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root{--bg:#0e0e10;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.1);--cyan:#00f0ff;--cyan-dim:rgba(0,240,255,0.1);--green:#00e676;--red:#ff4444;--text:#e5e1e4;--muted:#b9cacb;--font:'Geist',sans-serif;--mono:'Space Mono',monospace;}
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
-    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 10% 20%,rgba(0,240,255,.05) 0%,transparent 55%),radial-gradient(ellipse 60% 40% at 90% 80%,rgba(112,0,255,.04) 0%,transparent 55%);pointer-events:none;z-index:0;}
-    nav{position:sticky;top:0;z-index:100;background:rgba(14,14,16,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;}
-    .nav-logo{font-size:1.2rem;font-weight:700;color:var(--cyan);letter-spacing:-.02em;}
-    .nav-right{display:flex;align-items:center;gap:1rem;}
-    .nav-user{font-size:.85rem;color:var(--muted);}
-    .btn-nav{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.4rem 1rem;border-radius:8px;text-decoration:none;font-size:.85rem;transition:all .2s;}
-    .btn-nav:hover{border-color:rgba(0,240,255,.3);color:var(--cyan);}
-    .btn-new{background:var(--cyan);color:#000;border:none;padding:.45rem 1.1rem;border-radius:8px;font-family:var(--font);font-weight:700;font-size:.85rem;text-decoration:none;transition:box-shadow .2s;}
-    .btn-new:hover{box-shadow:0 0 20px rgba(0,240,255,.4);}
-    main{max-width:1200px;margin:0 auto;padding:2rem;position:relative;z-index:1;}
-    h1{font-size:1.8rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.3rem;}
-    .subtitle{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-bottom:2rem;}
-
-    /* CARDS */
-    .cards{display:grid;gap:1.25rem;}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(20px);transition:border-color .2s,transform .2s;overflow:hidden;}
-    .card:hover{border-color:rgba(0,240,255,.2);transform:translateY(-1px);}
-    .card-header{padding:1.1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-    .card-title{font-size:1rem;font-weight:600;}
-    .card-meta{font-family:var(--mono);font-size:.67rem;color:var(--muted);margin-top:.2rem;}
-    .card-body{padding:1.25rem;}
-
-    /* STATUS */
-    .status{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--mono);font-size:.62rem;font-weight:700;padding:.28rem .7rem;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
-    .s-pendiente{background:rgba(255,179,0,.12);color:#ffb300;border:1px solid rgba(255,179,0,.3);}
-    .s-en_revision{background:rgba(74,142,255,.12);color:#4a8eff;border:1px solid rgba(74,142,255,.3);}
-    .s-en_coordinacion{background:rgba(0,240,255,.1);color:var(--cyan);border:1px solid rgba(0,240,255,.25);}
-    .s-en_recepcion{background:rgba(255,179,0,.12);color:#ffb300;border:1px solid rgba(255,179,0,.3);}
-    .s-en_diagnostico{background:rgba(112,0,255,.15);color:#a47fff;border:1px solid rgba(112,0,255,.3);}
-    .s-esperando_aprobacion{background:rgba(255,193,7,.12);color:#ffc107;border:1px solid rgba(255,193,7,.3);}
-    .s-en_reparacion{background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3);}
-    .s-esperando_repuestos{background:rgba(249,115,22,.15);color:#fb923c;border:1px solid rgba(249,115,22,.3);}
-    .s-listo_para_retiro{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3);}
-    .s-completado,.s-finalizado{background:rgba(100,116,139,.12);color:#94a3b8;border:1px solid rgba(100,116,139,.25);}
-    .s-cancelado,.s-cancelado_por_tecnico,.s-producto_no_recibido{background:rgba(255,68,68,.1);color:var(--red);border:1px solid rgba(255,68,68,.25);}
-
-    /* PROGRESS BAR (9 steps) */
-    .progress-wrap{margin:1rem 0;}
-    .progress-bar{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
-    .progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--cyan),#4a8eff);box-shadow:0 0 8px var(--cyan);transition:width .6s ease;}
-    .progress-label{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:.35rem;}
-
-    /* NOTIFICATION BADGE */
-    .notify{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.3);border-radius:8px;padding:.5rem .9rem;margin-bottom:1rem;font-size:.85rem;color:#ffc107;width:100%;}
-    .notify strong{font-weight:700;}
-
-    /* ACTION BUTTONS */
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1rem;border-radius:8px;font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
-    .btn-detail{background:var(--surface);border:1px solid var(--border);color:var(--text);}
-    .btn-detail:hover{border-color:rgba(0,240,255,.3);color:var(--cyan);}
-    .btn-accept{background:var(--green);color:#000;}
-    .btn-accept:hover{box-shadow:0 0 16px rgba(0,230,118,.4);}
-    .btn-reject{background:rgba(255,68,68,.1);color:var(--red);border:1px solid rgba(255,68,68,.25);}
-    .btn-reject:hover{background:rgba(255,68,68,.2);}
-    .btn-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem;align-items:center;}
-
-    /* LAST MSG */
-    .last-msg{background:rgba(0,0,0,.2);border-radius:8px;padding:.65rem .9rem;margin:.75rem 0;font-size:.82rem;color:var(--muted);}
-    .last-msg strong{font-family:var(--mono);font-size:.62rem;color:var(--muted);display:block;margin-bottom:.2rem;}
-
-    /* EMPTY */
-    .empty{text-align:center;padding:4rem;color:var(--muted);}
-    .empty-icon{font-size:3rem;margin-bottom:1rem;opacity:.4;}
-
-    /* DESC */
-    .desc{color:var(--muted);font-size:.88rem;line-height:1.55;margin:.5rem 0;}
-  </style>
+  <link rel="stylesheet" href="/css/client-dash.css">
 </head>
 <body>
 <nav>
