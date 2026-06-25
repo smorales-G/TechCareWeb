@@ -415,20 +415,6 @@ video.media-thumb { object-fit: cover; }
 .avatar-preview { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-hover); display: none; }
 .avatar-preview.visible { display: block; }
 
-/* ===================== RESPONSIVE ===================== */
-@media (max-width: 768px) {
-  .navbar { padding: 1rem 4%; }
-  .container { padding: 2rem 4%; }
-  .section { padding: 3.5rem 4%; }
-  .hero h1 { font-size: 2.8rem; letter-spacing: -1px; }
-  .grid { grid-template-columns: 1fr; }
-  .grid-2 { grid-template-columns: 1fr; }
-  .services-grid { grid-template-columns: repeat(2, 1fr); }
-  footer { flex-direction: column; text-align: center; }
-  .chatbot-widget { width: calc(100vw - 32px); right: 16px; }
-  .page-header { flex-direction: column; align-items: flex-start; }
-  .action-btns { flex-direction: column; }
-}
 
 /* ===================== ANIMATIONS ===================== */
 @keyframes fadeUp {
