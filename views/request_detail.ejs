@@ -5,6 +5,7 @@
   <title>Detalle de Solicitud — TechCare.mza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --bg:#0e0e10; --surface:rgba(255,255,255,0.04); --surface-high:rgba(255,255,255,0.08);
@@ -110,7 +111,7 @@
 </head>
 <body>
 <nav>
-  <span class="nav-logo">⚡ TechCare.mza</span>
+  <span class="nav-logo"><i class="fa-solid fa-bolt"></i> TechCare.mza</span>
   <a href="/client/dashboard" class="btn-back">← Volver</a>
 </nav>
 
@@ -151,7 +152,7 @@
         <div class="card-head">Mensaje del técnico</div>
         <div class="card-body">
           <div class="tech-msg-box">
-            <div class="tech-msg-label">🔧 TÉCNICO</div>
+            <div class="tech-msg-label"><i class="fa-solid fa-wrench"></i> TÉCNICO</div>
             <p><%= request.tech_response %></p>
           </div>
         </div>
@@ -161,7 +162,7 @@
       <!-- Diagnóstico + decisión -->
       <% if (['esperando_aprobacion','esperando_respuesta_cliente'].includes(request.status)) { %>
       <div class="card" style="border-color:rgba(255,193,7,.3)">
-        <div class="card-head" style="color:#ffc107">📋 Diagnóstico técnico — Decisión requerida</div>
+        <div class="card-head" style="color:#ffc107"><i class="fa-solid fa-clipboard-list"></i> Diagnóstico técnico — Decisión requerida</div>
         <div class="card-body">
           <% if (request.diagnosis) { %>
           <div class="diag-box"><p><%= request.diagnosis %></p></div>
@@ -173,11 +174,11 @@
           <div class="decision-btns">
             <form method="POST" action="/client/request/<%= request.id %>/action">
               <input type="hidden" name="action" value="accept">
-              <button type="submit" class="btn btn-accept" style="width:100%">✅ Aceptar reparación</button>
+              <button type="submit" class="btn btn-accept" style="width:100%"><i class="fa-solid fa-check"></i> Aceptar reparación</button>
             </form>
             <form method="POST" action="/client/request/<%= request.id %>/action">
               <input type="hidden" name="action" value="reject">
-              <button type="submit" class="btn btn-reject" style="width:100%">❌ Rechazar presupuesto</button>
+              <button type="submit" class="btn btn-reject" style="width:100%"><i class="fa-solid fa-xmark"></i> Rechazar presupuesto</button>
             </form>
           </div>
         </div>
@@ -195,14 +196,14 @@
               <% } %>
               <% (messages || []).forEach(m => { %>
               <div class="msg <%= m.sender_role %>">
-                <div class="msg-name"><%= m.sender_role === 'bot' ? '🤖 BOT' : m.sender_name?.toUpperCase() %></div>
+                <div class="msg-name"><%= m.sender_role === 'bot' ? '<i class="fa-solid fa-robot"></i> BOT' : m.sender_name?.toUpperCase() %></div>
                 <%= m.content %>
               </div>
               <% }) %>
             </div>
             <form class="chat-form" id="chatForm">
               <input type="text" class="chat-input" id="chatInput" placeholder="Escribí tu mensaje..." autocomplete="off">
-              <button type="submit" class="chat-send">➤</button>
+              <button type="submit" class="chat-send"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
           </div>
         </div>
@@ -238,7 +239,7 @@
               else if (step.key === request.status) cls = 'active';
             %>
             <div class="step <%= cls %>">
-              <div class="step-dot"><% if(cls==='done'){ %>✓<% } else if(cls==='active'){ %>●<% } %></div>
+              <div class="step-dot"><% if(cls==='done'){ %><i class="fa-solid fa-check"></i><% } else if(cls==='active'){ %><i class="fa-solid fa-circle" style="font-size:0.5rem;"></i><% } %></div>
               <div>
                 <div class="step-label"><%= step.label %></div>
                 <div class="step-sub"><%= step.sub %></div>
@@ -297,7 +298,7 @@
       const msgs = await res.json();
       chatMsgs.innerHTML = msgs.map(m => `
         <div class="msg ${m.sender_role}">
-          <div class="msg-name">${m.sender_role === 'bot' ? '🤖 BOT' : (m.sender_name || m.sender_role).toUpperCase()}</div>
+          <div class="msg-name">${m.sender_role === 'bot' ? '<i class="fa-solid fa-robot"></i> BOT' : (m.sender_name || m.sender_role).toUpperCase()}</div>
           ${m.content}
         </div>
       `).join('') || '<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:2rem 0">Sin mensajes.</div>';

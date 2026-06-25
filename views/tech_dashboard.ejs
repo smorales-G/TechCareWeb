@@ -5,6 +5,7 @@
   <title>Panel Técnico — TechCare.mza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --bg: #0e0e10; --surface: rgba(255,255,255,0.04); --surface-high: rgba(255,255,255,0.08);
@@ -111,7 +112,7 @@
 </head>
 <body>
 <nav>
-  <span class="nav-logo">⚡ TechCare.mza</span>
+  <span class="nav-logo"><i class="fa-solid fa-bolt"></i> TechCare.mza</span>
   <div class="nav-right">
     <span class="badge-tech">[ TÉCNICO ]</span>
     <a href="/logout" class="btn-logout">Salir</a>
@@ -124,14 +125,14 @@
 
   <div class="filters">
     <a href="/tech/dashboard" class="filter-pill <%= filter==='all'?'active':'' %>">Todas</a>
-    <a href="/tech/dashboard?filter=active" class="filter-pill <%= filter==='active'?'active':'' %>">⚡ Activas</a>
-    <a href="/tech/dashboard?filter=closed" class="filter-pill <%= filter==='closed'?'active':'' %>">✓ Cerradas</a>
+    <a href="/tech/dashboard?filter=active" class="filter-pill <%= filter==='active'?'active':'' %>"><i class="fa-solid fa-bolt"></i> Activas</a>
+    <a href="/tech/dashboard?filter=closed" class="filter-pill <%= filter==='closed'?'active':'' %>"><i class="fa-solid fa-check"></i> Cerradas</a>
   </div>
 
   <div class="cards">
     <% if (!requests || requests.length === 0) { %>
     <div class="empty">
-      <div class="empty-icon">📂</div>
+      <div class="empty-icon"><i class="fa-regular fa-folder-open"></i></div>
       <p>No hay solicitudes en esta categoría.</p>
     </div>
     <% } %>
@@ -142,7 +143,7 @@
         <div>
           <div class="card-title"><%= req.device_type %> — <em style="color:var(--muted);font-style:normal;font-size:.9rem;"><%= req.problem_description?.substring(0,60) %>...</em></div>
           <div class="card-meta">Ticket #<%= req.id %> · Cliente: <strong style="color:var(--text)"><%= req.client_name %></strong> · <%= new Date(req.created_at).toLocaleDateString('es-AR') %></div>
-          <% if (req.estimatedTime) { %><span class="eta">⏱ <%= req.estimatedTime %></span><% } %>
+          <% if (req.estimatedTime) { %><span class="eta"><i class="fa-solid fa-stopwatch"></i> <%= req.estimatedTime %></span><% } %>
         </div>
         <span class="status s-<%= req.status %>"><%= req.status.replace(/_/g,' ') %></span>
       </div>
@@ -160,7 +161,7 @@
 
         <% if (req.lastMsg) { %>
         <div class="last-msg">
-          <strong>💬 Último mensaje — <%= req.lastMsg.sender_role %></strong>
+          <strong><i class="fa-solid fa-message"></i> Último mensaje — <%= req.lastMsg.sender_role %></strong>
           <%= req.lastMsg.content?.substring(0,120) %><%= req.lastMsg.content?.length > 120 ? '...' : '' %>
         </div>
         <% } %>
@@ -175,13 +176,13 @@
               <div class="field"><label>Mensaje al aceptar</label>
                 <textarea name="tech_response" placeholder="Ej: Hola, recibí tu solicitud. ¿El equipo enciende?" required></textarea>
               </div>
-              <button type="submit" class="btn btn-green btn-full">✅ Aceptar — Iniciar revisión</button>
+              <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-check"></i> Aceptar — Iniciar revisión</button>
             </form>
             <form method="POST" action="/tech/request/<%= req.id %>/cancel">
               <div class="field"><label>Motivo de cancelación</label>
                 <textarea name="tech_response" placeholder="Ej: No podemos atender este tipo de dispositivo."></textarea>
               </div>
-              <button type="submit" class="btn btn-red btn-full">❌ Cancelar solicitud</button>
+              <button type="submit" class="btn btn-red btn-full"><i class="fa-solid fa-xmark"></i> Cancelar solicitud</button>
             </form>
           </div>
         </div>
@@ -193,7 +194,7 @@
           <div class="field"><label>Mensaje de coordinación</label>
             <form method="POST" action="/tech/request/<%= req.id %>/coordinate" style="display:flex;gap:.75rem;align-items:flex-end">
               <div style="flex:1"><textarea name="notes" placeholder="Ej: Podés traer el equipo al taller de lunes a viernes de 9 a 18hs. Dirección: Av. San Martín 1200."></textarea></div>
-              <button type="submit" class="btn btn-blue" style="height:80px">📅 Confirmar coordinación</button>
+              <button type="submit" class="btn btn-blue" style="height:80px"><i class="fa-regular fa-calendar-check"></i> Confirmar coordinación</button>
             </form>
           </div>
         </div>
@@ -207,13 +208,13 @@
               <div class="field"><label>Estado físico al recibir</label>
                 <textarea name="notes" placeholder="Ej: Dispositivo recibido. Presenta grietas en pantalla, teclado ok, sin cargador."></textarea>
               </div>
-              <button type="submit" class="btn btn-green btn-full">📦 Dispositivo Recibido</button>
+              <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-box-open"></i> Dispositivo Recibido</button>
             </form>
             <form method="POST" action="/tech/request/<%= req.id %>/not-received">
               <div class="field"><label>Motivo</label>
                 <textarea name="notes" placeholder="Ej: El cliente no se presentó en la fecha acordada."></textarea>
               </div>
-              <button type="submit" class="btn btn-red btn-full">🚫 No Recibido / Cancelar</button>
+              <button type="submit" class="btn btn-red btn-full"><i class="fa-solid fa-ban"></i> No Recibido / Cancelar</button>
             </form>
           </div>
         </div>
@@ -227,7 +228,7 @@
               <div class="field"><label>Notas del triage físico</label>
                 <textarea name="notes" placeholder="Ej: Equipo en buen estado externo. Iniciando diagnóstico interno."></textarea>
               </div>
-              <button type="submit" class="btn btn-purple btn-full">🔬 Iniciar Diagnóstico</button>
+              <button type="submit" class="btn btn-purple btn-full"><i class="fa-solid fa-microscope"></i> Iniciar Diagnóstico</button>
             </form>
           </div>
         </div>
@@ -248,7 +249,7 @@
             <div class="field"><label>Informe técnico del diagnóstico</label>
               <textarea name="diagnosis" rows="3" placeholder="Ej: Pantalla OLED dañada por impacto. Táctil con falla en zona superior. Recomiendo cambio de módulo completo." required style="min-height:100px"></textarea>
             </div>
-            <button type="submit" class="btn btn-purple btn-full">📋 Enviar diagnóstico al cliente</button>
+            <button type="submit" class="btn btn-purple btn-full"><i class="fa-solid fa-clipboard-list"></i> Enviar diagnóstico al cliente</button>
           </form>
         </div>
         <% } %>
@@ -274,13 +275,13 @@
               <div class="field"><label>Motivo de espera</label>
                 <textarea name="notes" placeholder="Ej: Esperando componente X desde proveedor. ETA 3 días."></textarea>
               </div>
-              <button type="submit" class="btn btn-amber btn-full">⏳ Esperando repuestos</button>
+              <button type="submit" class="btn btn-amber btn-full"><i class="fa-solid fa-hourglass-half"></i> Esperando repuestos</button>
             </form>
             <form method="POST" action="/tech/request/<%= req.id %>/repaired">
               <div class="field"><label>Notas de control de calidad</label>
                 <textarea name="notes" placeholder="Ej: Módulo reemplazado. Testeado 30 min. Funciona correctamente."></textarea>
               </div>
-              <button type="submit" class="btn btn-green btn-full">✅ Reparación completa — Listo para retirar</button>
+              <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-check"></i> Reparación completa — Listo para retirar</button>
             </form>
           </div>
         </div>
@@ -293,7 +294,7 @@
             <div class="field"><label>Notas finales</label>
               <textarea name="notes" placeholder="Ej: Repuesto llegó. Instalado y testeado. Listo para retiro."></textarea>
             </div>
-            <button type="submit" class="btn btn-green btn-full">✅ Repuesto instalado — Listo para retirar</button>
+            <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-check"></i> Repuesto instalado — Listo para retirar</button>
           </form>
         </div>
         <% } %>
@@ -305,7 +306,7 @@
             <div class="field"><label>Notas de cierre</label>
               <textarea name="notes" placeholder="Ej: Dispositivo entregado. Cliente conforme. Pago cobrado."></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-full">🎉 Confirmar entrega — Cerrar servicio</button>
+            <button type="submit" class="btn btn-primary btn-full"><i class="fa-solid fa-party-horn"></i> Confirmar entrega — Cerrar servicio</button>
           </form>
         </div>
         <% } %>
@@ -314,8 +315,8 @@
         <div class="action-panel" style="opacity:.6">
           <div class="action-title" style="color:var(--muted)">Servicio cerrado</div>
           <p style="color:var(--muted);font-size:.85rem">
-            <% if (req.status === 'completado' || req.status === 'finalizado') { %>✓ Servicio completado exitosamente.
-            <% } else { %>✗ Servicio cancelado.<% } %>
+            <% if (req.status === 'completado' || req.status === 'finalizado') { %><i class="fa-solid fa-check"></i> Servicio completado exitosamente.
+            <% } else { %><i class="fa-solid fa-xmark"></i> Servicio cancelado.<% } %>
           </p>
         </div>
         <% } %>

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nueva Solicitud — TechCare.mza</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <nav class="navbar">
@@ -16,7 +17,7 @@
 
   <div class="container">
     <div class="glass-card fade-up" style="max-width:640px; margin:0 auto; width:100%;">
-      <h2 style="font-size:1.6rem; font-weight:800; margin-bottom:0.5rem;">🛠️ Nueva Solicitud</h2>
+      <h2 style="font-size:1.6rem; font-weight:800; margin-bottom:0.5rem;"><i class="fa-solid fa-screwdriver-wrench"></i> Nueva Solicitud</h2>
       <p style="color:var(--text-2); margin-bottom:2rem; font-size:0.95rem;">Describí el problema de tu dispositivo. Mientras más detalle mejor.</p>
 
       <form action="/client/request/new" method="POST" enctype="multipart/form-data" id="req-form">
@@ -38,7 +39,7 @@
         <div class="form-group">
           <label>Fotos / Videos <span style="color:var(--text-3); font-weight:400;">(opcional, máx. 5 archivos)</span></label>
           <label class="file-input-label">
-            <span>📎</span>
+            <span><i class="fa-solid fa-paperclip"></i></span>
             <span id="media-label">Seleccionar fotos o videos...</span>
             <input type="file" name="media" id="media-input" accept="image/*,video/*" multiple onchange="updateMediaLabel(event)">
           </label>

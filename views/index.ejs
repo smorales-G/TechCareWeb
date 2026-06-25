@@ -6,6 +6,7 @@
   <meta name="description" content="TechCare.mza — Servicio de mantenimiento técnico premium para computadoras, consolas, impresoras, teléfonos, laptops y tablets en Mendoza. Registrate y seguí el estado de tu reparación en tiempo real.">
   <title>TechCare.mza — Mantenimiento Técnico en Mendoza</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -34,7 +35,7 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero-eyebrow fade-up">
-      <span>🔧</span> Mantenimiento Técnico Premium · Mendoza
+      <span><i class="fa-solid fa-wrench"></i></span> Mantenimiento Técnico Premium · Mendoza
     </div>
     <h1 class="fade-up fade-up-1">
       Tu dispositivo,<br>
@@ -64,32 +65,32 @@
     </div>
     <div class="services-grid">
       <div class="service-card fade-up">
-        <span class="service-icon">💻</span>
+        <span class="service-icon"><i class="fa-solid fa-laptop"></i></span>
         <h3>Computadoras</h3>
         <p>PC de escritorio, hardware, software, limpieza y optimización</p>
       </div>
       <div class="service-card fade-up fade-up-1">
-        <span class="service-icon">🎮</span>
+        <span class="service-icon"><i class="fa-solid fa-gamepad"></i></span>
         <h3>Consolas</h3>
         <p>PlayStation, Xbox, Nintendo Switch y más</p>
       </div>
       <div class="service-card fade-up fade-up-2">
-        <span class="service-icon">🖨️</span>
+        <span class="service-icon"><i class="fa-solid fa-print"></i></span>
         <h3>Impresoras</h3>
         <p>Inkjet, láser, multifunción, cabezales y cartuchos</p>
       </div>
       <div class="service-card fade-up fade-up-3">
-        <span class="service-icon">📱</span>
+        <span class="service-icon"><i class="fa-solid fa-mobile-screen-button"></i></span>
         <h3>Teléfonos</h3>
         <p>iPhone, Android, pantallas, batería y más</p>
       </div>
       <div class="service-card fade-up fade-up-4">
-        <span class="service-icon">🖥️</span>
+        <span class="service-icon"><i class="fa-solid fa-desktop"></i></span>
         <h3>Laptops</h3>
         <p>Notebooks y ultrabooks de todas las marcas</p>
       </div>
       <div class="service-card fade-up fade-up-4">
-        <span class="service-icon">📲</span>
+        <span class="service-icon"><i class="fa-solid fa-tablet-screen-button"></i></span>
         <h3>Tablets</h3>
         <p>iPad, Samsung Tab, Lenovo y más marcas</p>
       </div>
@@ -135,42 +136,42 @@
     </div>
     <div class="why-grid">
       <div class="why-card">
-        <span class="why-icon">📡</span>
+        <span class="why-icon"><i class="fa-solid fa-satellite-dish"></i></span>
         <div>
           <h4>Seguimiento en tiempo real</h4>
           <p>Conocés el estado exacto de tu dispositivo en cada momento desde tu dashboard.</p>
         </div>
       </div>
       <div class="why-card">
-        <span class="why-icon">🔒</span>
+        <span class="why-icon"><i class="fa-solid fa-lock"></i></span>
         <div>
           <h4>Transparencia total</h4>
           <p>Antes de cualquier reparación recibís un presupuesto que podés aceptar o rechazar.</p>
         </div>
       </div>
       <div class="why-card">
-        <span class="why-icon">⚡</span>
+        <span class="why-icon"><i class="fa-solid fa-bolt"></i></span>
         <div>
           <h4>Técnicos especializados</h4>
           <p>Profesionales con experiencia en múltiples marcas y modelos de dispositivos.</p>
         </div>
       </div>
       <div class="why-card">
-        <span class="why-icon">🤖</span>
+        <span class="why-icon"><i class="fa-solid fa-robot"></i></span>
         <div>
           <h4>Soporte IA 24/7</h4>
           <p>Nuestro asistente virtual puede responder tus consultas en cualquier momento.</p>
         </div>
       </div>
       <div class="why-card">
-        <span class="why-icon">📁</span>
+        <span class="why-icon"><i class="fa-solid fa-folder"></i></span>
         <div>
           <h4>Historial completo</h4>
           <p>Guardamos el historial de cada reparación para que tengas todo registrado.</p>
         </div>
       </div>
       <div class="why-card">
-        <span class="why-icon">📍</span>
+        <span class="why-icon"><i class="fa-solid fa-location-dot"></i></span>
         <div>
           <h4>Basados en Mendoza</h4>
           <p>Servicio local, con atención personalizada y coordinación de entrega en persona.</p>
@@ -204,7 +205,7 @@
   <!-- CHATBOT WIDGET -->
   <div class="chatbot-widget collapsed" id="chatbot">
     <div class="chatbot-header" onclick="toggleChat()">
-      <h3>🤖 Soporte TechCare IA</h3>
+      <h3><i class="fa-solid fa-robot"></i> Soporte TechCare IA</h3>
       <span class="toggle-icon" id="chat-toggle-icon">▲</span>
     </div>
     <div class="chatbot-messages" id="chat-messages">
@@ -216,62 +217,6 @@
     </div>
   </div>
 
-  <script>
-    const chatWidget = document.getElementById('chatbot');
-    const chatIcon = document.getElementById('chat-toggle-icon');
-    const messagesContainer = document.getElementById('chat-messages');
-    const inputField = document.getElementById('chat-input');
-    let conversation = [
-      { role: 'system', content: 'Eres el asistente virtual de TechCare.mza, un servicio de mantenimiento técnico de dispositivos en Mendoza, Argentina. Responde en español, de forma amable y concisa. Puedes ayudar con consultas sobre tipos de reparaciones, el proceso, y precios aproximados.' }
-    ];
-
-    function toggleChat() {
-      chatWidget.classList.toggle('collapsed');
-      chatIcon.textContent = chatWidget.classList.contains('collapsed') ? '▲' : '▼';
-    }
-
-    function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
-
-    async function sendMessage() {
-      const text = inputField.value.trim();
-      if (!text) return;
-      addMessage(text, 'user');
-      inputField.value = '';
-      conversation.push({ role: 'user', content: text });
-      const typingId = 'typing-' + Date.now();
-      const typingEl = document.createElement('div');
-      typingEl.className = 'message bot'; typingEl.id = typingId;
-      typingEl.innerHTML = '<span class="typing-dot">●</span> <span class="typing-dot" style="animation-delay:0.2s">●</span> <span class="typing-dot" style="animation-delay:0.4s">●</span>';
-      messagesContainer.appendChild(typingEl);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      try {
-        const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conversation }) });
-        const data = await res.json();
-        document.getElementById(typingId)?.remove();
-        if (data.message?.content) {
-          addMessage(data.message.content, 'bot');
-          conversation.push({ role: 'assistant', content: data.message.content });
-        } else { addMessage('Hubo un error al conectar con el asistente.', 'bot'); }
-      } catch { document.getElementById(typingId)?.remove(); addMessage('No se pudo conectar con soporte.', 'bot'); }
-    }
-
-    function addMessage(text, sender) {
-      const div = document.createElement('div');
-      div.className = `message ${sender}`;
-      div.textContent = text;
-      messagesContainer.appendChild(div);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    // Scroll reveal animation
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = 1; e.target.style.transform = 'translateY(0)'; } });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.service-card, .step-card, .why-card').forEach(el => {
-      el.style.opacity = 0; el.style.transform = 'translateY(20px)';
-      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-      observer.observe(el);
-    });
-  </script>
+  <script src="./js/index.js"></script>
 </body>
 </html>

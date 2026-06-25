@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar Sesión — TechCare.mza</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <nav class="navbar">
@@ -14,13 +15,13 @@
   <div class="auth-wrapper">
     <div class="auth-box glass-card fade-up">
       <div style="text-align:center; margin-bottom:2rem;">
-        <div style="font-size:2.5rem; margin-bottom:0.75rem;">🔑</div>
+        <div style="font-size:2.5rem; margin-bottom:0.75rem;"><i class="fa-solid fa-key"></i></div>
         <h2>Bienvenido de vuelta</h2>
         <p class="subtitle">Ingresá para ver el estado de tus dispositivos</p>
       </div>
 
       <% if (error) { %>
-        <div class="error-msg">⚠️ <%= error %></div>
+        <div class="error-msg"><i class="fa-solid fa-triangle-exclamation"></i> <%= error %></div>
       <% } %>
 
       <form action="/login" method="POST" id="login-form">

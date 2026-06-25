@@ -5,6 +5,7 @@
   <title>Mis Solicitudes — TechCare.mza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root{--bg:#0e0e10;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.1);--cyan:#00f0ff;--cyan-dim:rgba(0,240,255,0.1);--green:#00e676;--red:#ff4444;--text:#e5e1e4;--muted:#b9cacb;--font:'Geist',sans-serif;--mono:'Space Mono',monospace;}
     *{margin:0;padding:0;box-sizing:border-box;}
@@ -79,9 +80,9 @@
 </head>
 <body>
 <nav>
-  <span class="nav-logo">⚡ TechCare.mza</span>
+  <span class="nav-logo"><i class="fa-solid fa-bolt"></i> TechCare.mza</span>
   <div class="nav-right">
-    <a href="/client/request/new" class="btn-new">+ Nueva Solicitud</a>
+    <a href="/client/request/new" class="btn-new"><i class="fa-solid fa-plus"></i> Nueva Solicitud</a>
     <a href="/logout" class="btn-nav">Salir</a>
   </div>
 </nav>
@@ -93,9 +94,9 @@
   <div class="cards">
     <% if (!requests || requests.length === 0) { %>
     <div class="empty">
-      <div class="empty-icon">📋</div>
+      <div class="empty-icon"><i class="fa-solid fa-clipboard-list"></i></div>
       <p>No tenés solicitudes todavía.</p>
-      <a href="/client/request/new" class="btn btn-detail" style="margin-top:1rem;display:inline-flex">+ Crear tu primera solicitud</a>
+      <a href="/client/request/new" class="btn btn-detail" style="margin-top:1rem;display:inline-flex"><i class="fa-solid fa-plus"></i> Crear tu primera solicitud</a>
     </div>
     <% } %>
 
@@ -125,13 +126,13 @@
 
         <% if (needsAction) { %>
         <div class="notify">
-          ⚠️ <strong>Acción requerida:</strong> El técnico cargó el diagnóstico. Revisá el presupuesto.
+          <i class="fa-solid fa-triangle-exclamation"></i> <strong>Acción requerida:</strong> El técnico cargó el diagnóstico. Revisá el presupuesto.
         </div>
         <% } %>
 
         <% if (req.status === 'listo_para_retiro') { %>
         <div class="notify" style="background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.3);color:var(--green)">
-          🎉 <strong>¡Tu equipo está listo!</strong> Podés pasar a retirarlo al taller.
+          <i class="fa-solid fa-champagne-glasses"></i> <strong>¡Tu equipo está listo!</strong> Podés pasar a retirarlo al taller.
         </div>
         <% } %>
 
@@ -139,21 +140,21 @@
 
         <% if (req.tech_response) { %>
         <div class="last-msg">
-          <strong>💬 TÉCNICO</strong><%= req.tech_response?.substring(0,100) %>...
+          <strong><i class="fa-solid fa-message"></i> TÉCNICO</strong><%= req.tech_response?.substring(0,100) %>...
         </div>
         <% } %>
 
         <div class="btn-actions">
-          <a href="/client/request/<%= req.id %>" class="btn btn-detail">👁 Ver detalle y chat</a>
+          <a href="/client/request/<%= req.id %>" class="btn btn-detail"><i class="fa-solid fa-eye"></i> Ver detalle y chat</a>
 
           <% if (needsAction) { %>
           <form method="POST" action="/client/request/<%= req.id %>/action" style="display:inline">
             <input type="hidden" name="action" value="accept">
-            <button type="submit" class="btn btn-accept">✅ Aceptar presupuesto</button>
+            <button type="submit" class="btn btn-accept"><i class="fa-solid fa-check"></i> Aceptar presupuesto</button>
           </form>
           <form method="POST" action="/client/request/<%= req.id %>/action" style="display:inline">
             <input type="hidden" name="action" value="reject">
-            <button type="submit" class="btn btn-reject">❌ Rechazar</button>
+            <button type="submit" class="btn btn-reject"><i class="fa-solid fa-xmark"></i> Rechazar</button>
           </form>
           <% } %>
         </div>
