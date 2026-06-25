@@ -1,151 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <title>Panel Técnico — TechCare.mza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg: #0e0e10; --surface: rgba(255,255,255,0.04); --surface-high: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.1); --cyan: #00f0ff; --cyan-dim: rgba(0,240,255,0.15);
-      --blue: #4a8eff; --purple: #7000ff; --green: #00e676; --red: #ff4444; --amber: #ffb300;
-      --text: #e5e1e4; --muted: #b9cacb; --font: 'Geist', sans-serif; --mono: 'Space Mono', monospace;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; }
-    /* bg mesh */
-    body::before { content:''; position:fixed; inset:0; background: radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,240,255,.06) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(112,0,255,.05) 0%, transparent 60%); pointer-events:none; z-index:0; }
-
-    /* NAV */
-    nav { position:sticky; top:0; z-index:100; background:rgba(14,14,16,.85); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:64px; }
-    .nav-logo { font-size:1.2rem; font-weight:700; color:var(--cyan); letter-spacing:-.02em; }
-    .nav-right { display:flex; align-items:center; gap:1rem; }
-    .badge-tech { background:var(--cyan-dim); color:var(--cyan); border:1px solid rgba(0,240,255,.3); font-family:var(--mono); font-size:.65rem; padding:.3rem .7rem; border-radius:4px; letter-spacing:.05em; }
-    .btn-logout { background:transparent; border:1px solid rgba(255,68,68,.4); color:#ff4444; font-family:var(--font); font-size:.85rem; padding:.4rem .9rem; border-radius:8px; cursor:pointer; transition:all .2s; }
-    .btn-logout:hover { background:rgba(255,68,68,.1); }
-
-    /* MAIN */
-    main { max-width:1400px; margin:0 auto; padding:2rem; position:relative; z-index:1; }
-    h1 { font-size:1.8rem; font-weight:700; letter-spacing:-.02em; margin-bottom:.4rem; }
-    .subtitle { color:var(--muted); font-size:.9rem; font-family:var(--mono); margin-bottom:1.5rem; }
-
-    /* FILTERS */
-    .filters { display:flex; gap:.5rem; margin-bottom:2rem; }
-    .filter-pill { background:var(--surface); border:1px solid var(--border); color:var(--muted); padding:.4rem 1.2rem; border-radius:99px; font-size:.85rem; cursor:pointer; text-decoration:none; transition:all .2s; }
-    .filter-pill.active, .filter-pill:hover { background:var(--cyan-dim); border-color:rgba(0,240,255,.4); color:var(--cyan); }
-
-    /* CARDS GRID */
-    .cards { display:grid; gap:1.5rem; }
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; backdrop-filter:blur(20px); overflow:hidden; transition:border-color .2s; }
-    .card:hover { border-color:rgba(0,240,255,.25); }
-    .card-header { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
-    .card-body { padding:1.5rem; }
-    .card-title { font-size:1.1rem; font-weight:600; margin-bottom:.3rem; }
-    .card-meta { font-family:var(--mono); font-size:.7rem; color:var(--muted); }
-    .card-desc { color:var(--muted); font-size:.9rem; line-height:1.6; margin-bottom:1.25rem; }
-
-    /* STATUS BADGES */
-    .status { display:inline-flex; align-items:center; gap:.4rem; font-family:var(--mono); font-size:.65rem; font-weight:700; padding:.3rem .75rem; border-radius:4px; text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
-    .s-pendiente          { background:rgba(255,179,0,.12); color:#ffb300; border:1px solid rgba(255,179,0,.3); }
-    .s-en_revision        { background:rgba(74,142,255,.12); color:#4a8eff; border:1px solid rgba(74,142,255,.3); }
-    .s-en_coordinacion    { background:rgba(0,240,255,.1); color:var(--cyan); border:1px solid rgba(0,240,255,.25); }
-    .s-en_recepcion       { background:rgba(255,179,0,.12); color:#ffb300; border:1px solid rgba(255,179,0,.3); }
-    .s-en_diagnostico     { background:rgba(112,0,255,.15); color:#a47fff; border:1px solid rgba(112,0,255,.3); }
-    .s-esperando_aprobacion { background:rgba(255,193,7,.12); color:#ffc107; border:1px solid rgba(255,193,7,.3); }
-    .s-en_reparacion      { background:rgba(99,102,241,.15); color:#818cf8; border:1px solid rgba(99,102,241,.3); }
-    .s-esperando_repuestos { background:rgba(249,115,22,.15); color:#fb923c; border:1px solid rgba(249,115,22,.3); }
-    .s-listo_para_retiro  { background:rgba(0,230,118,.12); color:var(--green); border:1px solid rgba(0,230,118,.3); }
-    .s-completado, .s-finalizado { background:rgba(100,116,139,.12); color:#94a3b8; border:1px solid rgba(100,116,139,.25); }
-    .s-cancelado, .s-cancelado_por_tecnico, .s-producto_no_recibido { background:rgba(255,68,68,.1); color:var(--red); border:1px solid rgba(255,68,68,.25); }
-
-    /* ESTIMATED TIME */
-    .eta { font-family:var(--mono); font-size:.7rem; color:var(--cyan); background:var(--cyan-dim); border:1px solid rgba(0,240,255,.2); padding:.2rem .6rem; border-radius:4px; display:inline-block; margin-top:.4rem; }
-
-    /* LAST MESSAGE */
-    .last-msg { background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:8px; padding:.75rem 1rem; margin-bottom:1.25rem; font-size:.85rem; color:var(--muted); }
-    .last-msg strong { color:var(--text); font-size:.75rem; display:block; margin-bottom:.25rem; font-family:var(--mono); }
-
-    /* ACTION PANELS */
-    .action-panel { background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:12px; padding:1.25rem; }
-    .action-title { font-family:var(--mono); font-size:.7rem; color:var(--cyan); letter-spacing:.08em; text-transform:uppercase; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
-    .action-title::before { content:''; width:8px; height:8px; background:var(--cyan); border-radius:50%; box-shadow:0 0 8px var(--cyan); }
-    .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
-    .action-grid.single { grid-template-columns:1fr; }
-    textarea, input[type=text], input[type=number] {
-      width:100%; background:rgba(0,0,0,.3); border:1px solid var(--border); color:var(--text);
-      font-family:var(--font); font-size:.85rem; padding:.7rem .9rem; border-radius:8px;
-      resize:vertical; transition:border-color .2s; min-height:80px;
-    }
-    input[type=number] { min-height:auto; }
-    textarea:focus, input:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 1px rgba(0,240,255,.2); }
-    label { font-family:var(--mono); font-size:.65rem; color:var(--muted); letter-spacing:.05em; text-transform:uppercase; display:block; margin-bottom:.35rem; }
-    .field { margin-bottom:.75rem; }
-    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:.75rem; }
-
-    /* BUTTONS */
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:.55rem 1rem; border-radius:8px; font-family:var(--font); font-size:.85rem; font-weight:600; cursor:pointer; border:none; transition:all .2s; white-space:nowrap; }
-    .btn-primary { background:var(--cyan); color:#000; }
-    .btn-primary:hover { box-shadow:0 0 20px rgba(0,240,255,.4); }
-    .btn-green { background:rgba(0,230,118,.15); color:var(--green); border:1px solid rgba(0,230,118,.3); }
-    .btn-green:hover { background:rgba(0,230,118,.25); }
-    .btn-red { background:rgba(255,68,68,.1); color:var(--red); border:1px solid rgba(255,68,68,.25); }
-    .btn-red:hover { background:rgba(255,68,68,.2); }
-    .btn-blue { background:rgba(74,142,255,.15); color:var(--blue); border:1px solid rgba(74,142,255,.3); }
-    .btn-blue:hover { background:rgba(74,142,255,.25); }
-    .btn-purple { background:rgba(112,0,255,.15); color:#a47fff; border:1px solid rgba(112,0,255,.3); }
-    .btn-purple:hover { background:rgba(112,0,255,.25); }
-    .btn-amber { background:rgba(255,179,0,.12); color:var(--amber); border:1px solid rgba(255,179,0,.3); }
-    .btn-amber:hover { background:rgba(255,179,0,.22); }
-    .btn-sm { padding:.4rem .8rem; font-size:.8rem; }
-    .btn-full { width:100%; }
-
-    /* EMPTY */
-    .empty { text-align:center; padding:4rem 2rem; color:var(--muted); }
-    .empty-icon { font-size:3rem; margin-bottom:1rem; opacity:.5; }
-
-    /* MEDIA */
-    .media-grid { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
-    .media-thumb { width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid var(--border); }
-  </style>
+  <link rel="stylesheet" href="/css/tech-dash.css">
 </head>
+
 <body>
-<nav>
-  <span class="nav-logo"><i class="fa-solid fa-bolt"></i> TechCare.mza</span>
-  <div class="nav-right">
-    <span class="badge-tech">[ TÉCNICO ]</span>
-    <a href="/logout" class="btn-logout">Salir</a>
-  </div>
-</nav>
-
-<main>
-  <h1>Panel de Solicitudes</h1>
-  <p class="subtitle">FLUJO_OPTIMIZADO_V2 // <%= new Date().toLocaleDateString('es-AR') %></p>
-
-  <div class="filters">
-    <a href="/tech/dashboard" class="filter-pill <%= filter==='all'?'active':'' %>">Todas</a>
-    <a href="/tech/dashboard?filter=active" class="filter-pill <%= filter==='active'?'active':'' %>"><i class="fa-solid fa-bolt"></i> Activas</a>
-    <a href="/tech/dashboard?filter=closed" class="filter-pill <%= filter==='closed'?'active':'' %>"><i class="fa-solid fa-check"></i> Cerradas</a>
-  </div>
-
-  <div class="cards">
-    <% if (!requests || requests.length === 0) { %>
-    <div class="empty">
-      <div class="empty-icon"><i class="fa-regular fa-folder-open"></i></div>
-      <p>No hay solicitudes en esta categoría.</p>
+  <nav>
+    <span class="nav-logo"><i class="fa-solid fa-bolt"></i> TechCare.mza</span>
+    <div class="nav-right">
+      <span class="badge-tech">[ TÉCNICO ]</span>
+      <a href="/logout" class="btn-logout">Salir</a>
     </div>
-    <% } %>
+  </nav>
 
-    <% requests.forEach(req => { %>
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title"><%= req.device_type %> — <em style="color:var(--muted);font-style:normal;font-size:.9rem;"><%= req.problem_description?.substring(0,60) %>...</em></div>
-          <div class="card-meta">Ticket #<%= req.id %> · Cliente: <strong style="color:var(--text)"><%= req.client_name %></strong> · <%= new Date(req.created_at).toLocaleDateString('es-AR') %></div>
-          <% if (req.estimatedTime) { %><span class="eta"><i class="fa-solid fa-stopwatch"></i> <%= req.estimatedTime %></span><% } %>
+  <main>
+    <h1>Panel de Solicitudes</h1>
+    <p class="subtitle">FLUJO_OPTIMIZADO_V2 // <%= new Date().toLocaleDateString('es-AR') %>
+    </p>
+
+    <div class="filters">
+      <a href="/tech/dashboard" class="filter-pill <%= filter==='all'?'active':'' %>">Todas</a>
+      <a href="/tech/dashboard?filter=active" class="filter-pill <%= filter==='active'?'active':'' %>"><i
+          class="fa-solid fa-bolt"></i> Activas</a>
+      <a href="/tech/dashboard?filter=closed" class="filter-pill <%= filter==='closed'?'active':'' %>"><i
+          class="fa-solid fa-check"></i> Cerradas</a>
+    </div>
+
+    <div class="cards">
+      <% if (!requests || requests.length===0) { %>
+        <div class="empty">
+          <div class="empty-icon"><i class="fa-regular fa-folder-open"></i></div>
+          <p>No hay solicitudes en esta categoría.</p>
         </div>
-        <span class="status s-<%= req.status %>"><%= req.status.replace(/_/g,' ') %></span>
+        <% } %>
+
+          <% requests.forEach(req=> { %>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">
+                    <%= req.device_type %> — <em style="color:var(--muted);font-style:normal;font-size:.9rem;">
+                        <%= req.problem_description?.substring(0,60) %>...
+                      </em>
+                  </div>
+                  <div class="card-meta">Ticket #<%= req.id %> · Cliente: <strong style="color:var(--text)">
+                        <%= req.client_name %>
+                      </strong> · <%= new Date(req.created_at).toLocaleDateString('es-AR') %>
+                  </div>
+                  <% if (req.estimatedTime) { %><span class="eta"><i class="fa-solid fa-stopwatch"></i>
+                      <%= req.estimatedTime %>
+                    </span>
+                    <% } %>
+                </div>
+                <span class="status s-<%= req.status %>">
+                  <%= req.status.replace(/_/g,' ') %></span>
       </div>
 
       <div class="card-body">
@@ -153,177 +69,229 @@
 
         <% if (req.media && req.media.length > 0) { %>
         <div class="media-grid">
-          <% req.media.forEach(m => { if(m.file_type?.startsWith('image')) { %>
-          <img src="<%= m.file_url %>" class="media-thumb" alt="Media">
-          <% } }) %>
-        </div>
-        <% } %>
-
-        <% if (req.lastMsg) { %>
-        <div class="last-msg">
-          <strong><i class="fa-solid fa-message"></i> Último mensaje — <%= req.lastMsg.sender_role %></strong>
-          <%= req.lastMsg.content?.substring(0,120) %><%= req.lastMsg.content?.length > 120 ? '...' : '' %>
-        </div>
-        <% } %>
-
-        <!-- ===== ACCIONES POR ESTADO ===== -->
-
-        <% if (req.status === 'pendiente') { %>
-        <div class="action-panel">
-          <div class="action-title">Paso 1 — Revisión de Solicitud</div>
-          <div class="action-grid">
-            <form method="POST" action="/tech/request/<%= req.id %>/accept">
-              <div class="field"><label>Mensaje al aceptar</label>
-                <textarea name="tech_response" placeholder="Ej: Hola, recibí tu solicitud. ¿El equipo enciende?" required></textarea>
+          <% req.media.forEach(m => { if(m.file_type?.startsWith(' image')) { %>
+                    <img src="<%= m.file_url %>" class="media-thumb" alt="Media">
+                    <% } }) %>
               </div>
-              <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-check"></i> Aceptar — Iniciar revisión</button>
-            </form>
-            <form method="POST" action="/tech/request/<%= req.id %>/cancel">
-              <div class="field"><label>Motivo de cancelación</label>
-                <textarea name="tech_response" placeholder="Ej: No podemos atender este tipo de dispositivo."></textarea>
-              </div>
-              <button type="submit" class="btn btn-red btn-full"><i class="fa-solid fa-xmark"></i> Cancelar solicitud</button>
-            </form>
-          </div>
-        </div>
-        <% } %>
+              <% } %>
 
-        <% if (req.status === 'en_revision') { %>
-        <div class="action-panel">
-          <div class="action-title">Paso 2 — Coordinar Ingreso del Dispositivo</div>
-          <div class="field"><label>Mensaje de coordinación</label>
-            <form method="POST" action="/tech/request/<%= req.id %>/coordinate" style="display:flex;gap:.75rem;align-items:flex-end">
-              <div style="flex:1"><textarea name="notes" placeholder="Ej: Podés traer el equipo al taller de lunes a viernes de 9 a 18hs. Dirección: Av. San Martín 1200."></textarea></div>
-              <button type="submit" class="btn btn-blue" style="height:80px"><i class="fa-regular fa-calendar-check"></i> Confirmar coordinación</button>
-            </form>
-          </div>
-        </div>
-        <% } %>
+                <% if (req.lastMsg) { %>
+                  <div class="last-msg">
+                    <strong><i class="fa-solid fa-message"></i> Último mensaje — <%= req.lastMsg.sender_role %></strong>
+                    <%= req.lastMsg.content?.substring(0,120) %>
+                      <%= req.lastMsg.content?.length> 120 ? '...' : '' %>
+                  </div>
+                  <% } %>
 
-        <% if (req.status === 'en_coordinacion') { %>
-        <div class="action-panel">
-          <div class="action-title">Paso 3 — Recepción del Dispositivo</div>
-          <div class="action-grid">
-            <form method="POST" action="/tech/request/<%= req.id %>/arrived">
-              <div class="field"><label>Estado físico al recibir</label>
-                <textarea name="notes" placeholder="Ej: Dispositivo recibido. Presenta grietas en pantalla, teclado ok, sin cargador."></textarea>
-              </div>
-              <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-box-open"></i> Dispositivo Recibido</button>
-            </form>
-            <form method="POST" action="/tech/request/<%= req.id %>/not-received">
-              <div class="field"><label>Motivo</label>
-                <textarea name="notes" placeholder="Ej: El cliente no se presentó en la fecha acordada."></textarea>
-              </div>
-              <button type="submit" class="btn btn-red btn-full"><i class="fa-solid fa-ban"></i> No Recibido / Cancelar</button>
-            </form>
-          </div>
-        </div>
-        <% } %>
+                    <!-- ===== ACCIONES POR ESTADO ===== -->
 
-        <% if (req.status === 'en_recepcion') { %>
-        <div class="action-panel">
-          <div class="action-title">Paso 4 — Iniciar Diagnóstico Técnico</div>
-          <div class="action-grid single">
-            <form method="POST" action="/tech/request/<%= req.id %>/start-diagnosis">
-              <div class="field"><label>Notas del triage físico</label>
-                <textarea name="notes" placeholder="Ej: Equipo en buen estado externo. Iniciando diagnóstico interno."></textarea>
-              </div>
-              <button type="submit" class="btn btn-purple btn-full"><i class="fa-solid fa-microscope"></i> Iniciar Diagnóstico</button>
-            </form>
-          </div>
-        </div>
-        <% } %>
+                    <% if (req.status==='pendiente' ) { %>
+                      <div class="action-panel">
+                        <div class="action-title">Paso 1 — Revisión de Solicitud</div>
+                        <div class="action-grid">
+                          <form method="POST" action="/tech/request/<%= req.id %>/accept">
+                            <div class="field"><label>Mensaje al aceptar</label>
+                              <textarea name="tech_response"
+                                placeholder="Ej: Hola, recibí tu solicitud. ¿El equipo enciende?" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-check"></i>
+                              Aceptar — Iniciar revisión</button>
+                          </form>
+                          <form method="POST" action="/tech/request/<%= req.id %>/cancel">
+                            <div class="field"><label>Motivo de cancelación</label>
+                              <textarea name="tech_response"
+                                placeholder="Ej: No podemos atender este tipo de dispositivo."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-red btn-full"><i class="fa-solid fa-xmark"></i>
+                              Cancelar solicitud</button>
+                          </form>
+                        </div>
+                      </div>
+                      <% } %>
 
-        <% if (req.status === 'en_diagnostico') { %>
-        <div class="action-panel">
-          <div class="action-title">Paso 5 — Informe de Diagnóstico y Presupuesto</div>
-          <form method="POST" action="/tech/request/<%= req.id %>/diagnosis">
-            <div class="field-row">
-              <div class="field"><label>Precio de reparación ($)</label>
-                <input type="number" name="price" placeholder="Ej: 18000" min="0" step="100" required style="min-height:auto">
-              </div>
-              <div class="field"><label>Notas adicionales</label>
-                <input type="text" name="notes" placeholder="Opcional" style="min-height:auto">
-              </div>
+                        <% if (req.status==='en_revision' ) { %>
+                          <div class="action-panel">
+                            <div class="action-title">Paso 2 — Coordinar Ingreso del Dispositivo</div>
+                            <div class="field"><label>Mensaje de coordinación</label>
+                              <form method="POST" action="/tech/request/<%= req.id %>/coordinate"
+                                style="display:flex;gap:.75rem;align-items:flex-end">
+                                <div style="flex:1"><textarea name="notes"
+                                    placeholder="Ej: Podés traer el equipo al taller de lunes a viernes de 9 a 18hs. Dirección: Av. San Martín 1200."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-blue" style="height:80px"><i
+                                    class="fa-regular fa-calendar-check"></i> Confirmar coordinación</button>
+                              </form>
+                            </div>
+                          </div>
+                          <% } %>
+
+                            <% if (req.status==='en_coordinacion' ) { %>
+                              <div class="action-panel">
+                                <div class="action-title">Paso 3 — Recepción del Dispositivo</div>
+                                <div class="action-grid">
+                                  <form method="POST" action="/tech/request/<%= req.id %>/arrived">
+                                    <div class="field"><label>Estado físico al recibir</label>
+                                      <textarea name="notes"
+                                        placeholder="Ej: Dispositivo recibido. Presenta grietas en pantalla, teclado ok, sin cargador."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-green btn-full"><i
+                                        class="fa-solid fa-box-open"></i> Dispositivo Recibido</button>
+                                  </form>
+                                  <form method="POST" action="/tech/request/<%= req.id %>/not-received">
+                                    <div class="field"><label>Motivo</label>
+                                      <textarea name="notes"
+                                        placeholder="Ej: El cliente no se presentó en la fecha acordada."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-red btn-full"><i class="fa-solid fa-ban"></i>
+                                      No Recibido / Cancelar</button>
+                                  </form>
+                                </div>
+                              </div>
+                              <% } %>
+
+                                <% if (req.status==='en_recepcion' ) { %>
+                                  <div class="action-panel">
+                                    <div class="action-title">Paso 4 — Iniciar Diagnóstico Técnico</div>
+                                    <div class="action-grid single">
+                                      <form method="POST" action="/tech/request/<%= req.id %>/start-diagnosis">
+                                        <div class="field"><label>Notas del triage físico</label>
+                                          <textarea name="notes"
+                                            placeholder="Ej: Equipo en buen estado externo. Iniciando diagnóstico interno."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-purple btn-full"><i
+                                            class="fa-solid fa-microscope"></i> Iniciar Diagnóstico</button>
+                                      </form>
+                                    </div>
+                                  </div>
+                                  <% } %>
+
+                                    <% if (req.status==='en_diagnostico' ) { %>
+                                      <div class="action-panel">
+                                        <div class="action-title">Paso 5 — Informe de Diagnóstico y Presupuesto</div>
+                                        <form method="POST" action="/tech/request/<%= req.id %>/diagnosis">
+                                          <div class="field-row">
+                                            <div class="field"><label>Precio de reparación ($)</label>
+                                              <input type="number" name="price" placeholder="Ej: 18000" min="0"
+                                                step="100" required style="min-height:auto">
+                                            </div>
+                                            <div class="field"><label>Notas adicionales</label>
+                                              <input type="text" name="notes" placeholder="Opcional"
+                                                style="min-height:auto">
+                                            </div>
+                                          </div>
+                                          <div class="field"><label>Informe técnico del diagnóstico</label>
+                                            <textarea name="diagnosis" rows="3"
+                                              placeholder="Ej: Pantalla OLED dañada por impacto. Táctil con falla en zona superior. Recomiendo cambio de módulo completo."
+                                              required style="min-height:100px"></textarea>
+                                          </div>
+                                          <button type="submit" class="btn btn-purple btn-full"><i
+                                              class="fa-solid fa-clipboard-list"></i> Enviar diagnóstico al
+                                            cliente</button>
+                                        </form>
+                                      </div>
+                                      <% } %>
+
+                                        <% if (req.status==='esperando_aprobacion' ) { %>
+                                          <div class="action-panel" style="border-color:rgba(255,193,7,.3)">
+                                            <div class="action-title" style="color:#ffc107">Esperando decisión del
+                                              cliente</div>
+                                            <% if (req.diagnosis) { %>
+                                              <p style="color:var(--muted);font-size:.85rem;margin-bottom:.75rem">
+                                                <strong style="color:var(--text)">Diagnóstico:</strong>
+                                                <%= req.diagnosis %>
+                                              </p>
+                                              <% } %>
+                                                <% if (req.price) { %>
+                                                  <p
+                                                    style="font-family:var(--mono);font-size:1rem;color:var(--green);margin-bottom:1rem">
+                                                    Presupuesto: $<%= parseFloat(req.price).toLocaleString('es-AR') %>
+                                                  </p>
+                                                  <% } %>
+                                                    <p style="color:var(--muted);font-size:.8rem">El cliente debe
+                                                      aceptar o rechazar el presupuesto desde su panel.</p>
+                                          </div>
+                                          <% } %>
+
+                                            <% if (req.status==='en_reparacion' ) { %>
+                                              <div class="action-panel">
+                                                <div class="action-title">Paso 7 — En Reparación</div>
+                                                <div class="action-grid">
+                                                  <form method="POST"
+                                                    action="/tech/request/<%= req.id %>/waiting-parts">
+                                                    <div class="field"><label>Motivo de espera</label>
+                                                      <textarea name="notes"
+                                                        placeholder="Ej: Esperando componente X desde proveedor. ETA 3 días."></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-amber btn-full"><i
+                                                        class="fa-solid fa-hourglass-half"></i> Esperando
+                                                      repuestos</button>
+                                                  </form>
+                                                  <form method="POST" action="/tech/request/<%= req.id %>/repaired">
+                                                    <div class="field"><label>Notas de control de calidad</label>
+                                                      <textarea name="notes"
+                                                        placeholder="Ej: Módulo reemplazado. Testeado 30 min. Funciona correctamente."></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-green btn-full"><i
+                                                        class="fa-solid fa-check"></i> Reparación completa — Listo para
+                                                      retirar</button>
+                                                  </form>
+                                                </div>
+                                              </div>
+                                              <% } %>
+
+                                                <% if (req.status==='esperando_repuestos' ) { %>
+                                                  <div class="action-panel">
+                                                    <div class="action-title">Sub-estado — Esperando Repuestos</div>
+                                                    <form method="POST" action="/tech/request/<%= req.id %>/repaired">
+                                                      <div class="field"><label>Notas finales</label>
+                                                        <textarea name="notes"
+                                                          placeholder="Ej: Repuesto llegó. Instalado y testeado. Listo para retiro."></textarea>
+                                                      </div>
+                                                      <button type="submit" class="btn btn-green btn-full"><i
+                                                          class="fa-solid fa-check"></i> Repuesto instalado — Listo para
+                                                        retirar</button>
+                                                    </form>
+                                                  </div>
+                                                  <% } %>
+
+                                                    <% if (req.status==='listo_para_retiro' ) { %>
+                                                      <div class="action-panel" style="border-color:rgba(0,230,118,.3)">
+                                                        <div class="action-title" style="color:var(--green)">Paso 9 —
+                                                          Confirmar Entrega</div>
+                                                        <form method="POST"
+                                                          action="/tech/request/<%= req.id %>/delivered">
+                                                          <div class="field"><label>Notas de cierre</label>
+                                                            <textarea name="notes"
+                                                              placeholder="Ej: Dispositivo entregado. Cliente conforme. Pago cobrado."></textarea>
+                                                          </div>
+                                                          <button type="submit" class="btn btn-primary btn-full"><i
+                                                              class="fa-solid fa-party-horn"></i> Confirmar entrega —
+                                                            Cerrar servicio</button>
+                                                        </form>
+                                                      </div>
+                                                      <% } %>
+
+                                                        <% if
+                                                          (['completado','cancelado','cancelado_por_tecnico','producto_no_recibido','finalizado'].includes(req.status))
+                                                          { %>
+                                                          <div class="action-panel" style="opacity:.6">
+                                                            <div class="action-title" style="color:var(--muted)">
+                                                              Servicio cerrado</div>
+                                                            <p style="color:var(--muted);font-size:.85rem">
+                                                              <% if (req.status==='completado' ||
+                                                                req.status==='finalizado' ) { %><i
+                                                                  class="fa-solid fa-check"></i> Servicio completado
+                                                                exitosamente.
+                                                                <% } else { %><i class="fa-solid fa-xmark"></i> Servicio
+                                                                  cancelado.<% } %>
+                                                            </p>
+                                                          </div>
+                                                          <% } %>
             </div>
-            <div class="field"><label>Informe técnico del diagnóstico</label>
-              <textarea name="diagnosis" rows="3" placeholder="Ej: Pantalla OLED dañada por impacto. Táctil con falla en zona superior. Recomiendo cambio de módulo completo." required style="min-height:100px"></textarea>
-            </div>
-            <button type="submit" class="btn btn-purple btn-full"><i class="fa-solid fa-clipboard-list"></i> Enviar diagnóstico al cliente</button>
-          </form>
-        </div>
-        <% } %>
-
-        <% if (req.status === 'esperando_aprobacion') { %>
-        <div class="action-panel" style="border-color:rgba(255,193,7,.3)">
-          <div class="action-title" style="color:#ffc107">Esperando decisión del cliente</div>
-          <% if (req.diagnosis) { %>
-          <p style="color:var(--muted);font-size:.85rem;margin-bottom:.75rem"><strong style="color:var(--text)">Diagnóstico:</strong> <%= req.diagnosis %></p>
-          <% } %>
-          <% if (req.price) { %>
-          <p style="font-family:var(--mono);font-size:1rem;color:var(--green);margin-bottom:1rem">Presupuesto: $<%= parseFloat(req.price).toLocaleString('es-AR') %></p>
-          <% } %>
-          <p style="color:var(--muted);font-size:.8rem">El cliente debe aceptar o rechazar el presupuesto desde su panel.</p>
-        </div>
-        <% } %>
-
-        <% if (req.status === 'en_reparacion') { %>
-        <div class="action-panel">
-          <div class="action-title">Paso 7 — En Reparación</div>
-          <div class="action-grid">
-            <form method="POST" action="/tech/request/<%= req.id %>/waiting-parts">
-              <div class="field"><label>Motivo de espera</label>
-                <textarea name="notes" placeholder="Ej: Esperando componente X desde proveedor. ETA 3 días."></textarea>
-              </div>
-              <button type="submit" class="btn btn-amber btn-full"><i class="fa-solid fa-hourglass-half"></i> Esperando repuestos</button>
-            </form>
-            <form method="POST" action="/tech/request/<%= req.id %>/repaired">
-              <div class="field"><label>Notas de control de calidad</label>
-                <textarea name="notes" placeholder="Ej: Módulo reemplazado. Testeado 30 min. Funciona correctamente."></textarea>
-              </div>
-              <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-check"></i> Reparación completa — Listo para retirar</button>
-            </form>
-          </div>
-        </div>
-        <% } %>
-
-        <% if (req.status === 'esperando_repuestos') { %>
-        <div class="action-panel">
-          <div class="action-title">Sub-estado — Esperando Repuestos</div>
-          <form method="POST" action="/tech/request/<%= req.id %>/repaired">
-            <div class="field"><label>Notas finales</label>
-              <textarea name="notes" placeholder="Ej: Repuesto llegó. Instalado y testeado. Listo para retiro."></textarea>
-            </div>
-            <button type="submit" class="btn btn-green btn-full"><i class="fa-solid fa-check"></i> Repuesto instalado — Listo para retirar</button>
-          </form>
-        </div>
-        <% } %>
-
-        <% if (req.status === 'listo_para_retiro') { %>
-        <div class="action-panel" style="border-color:rgba(0,230,118,.3)">
-          <div class="action-title" style="color:var(--green)">Paso 9 — Confirmar Entrega</div>
-          <form method="POST" action="/tech/request/<%= req.id %>/delivered">
-            <div class="field"><label>Notas de cierre</label>
-              <textarea name="notes" placeholder="Ej: Dispositivo entregado. Cliente conforme. Pago cobrado."></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-full"><i class="fa-solid fa-party-horn"></i> Confirmar entrega — Cerrar servicio</button>
-          </form>
-        </div>
-        <% } %>
-
-        <% if (['completado','cancelado','cancelado_por_tecnico','producto_no_recibido','finalizado'].includes(req.status)) { %>
-        <div class="action-panel" style="opacity:.6">
-          <div class="action-title" style="color:var(--muted)">Servicio cerrado</div>
-          <p style="color:var(--muted);font-size:.85rem">
-            <% if (req.status === 'completado' || req.status === 'finalizado') { %><i class="fa-solid fa-check"></i> Servicio completado exitosamente.
-            <% } else { %><i class="fa-solid fa-xmark"></i> Servicio cancelado.<% } %>
-          </p>
-        </div>
-        <% } %>
-      </div>
     </div>
     <% }) %>
-  </div>
-</main>
+      </div>
+  </main>
 </body>
+
 </html>
