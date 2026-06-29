@@ -48,7 +48,7 @@
           <div class="desc-box"><%= request.problem_description %></div>
           <% if (media && media.length > 0) { %>
           <div class="media-row" style="margin-top:.75rem">
-            <% media.forEach(m => { if(m.file_type?.startsWith(' image')) { %>
+            <% media.forEach(m => { if(m.file_type?.startsWith('image')) { %>
           <img src="<%= m.file_url %>" class="media-thumb" alt="Media">
           <% } }) %>
     </div>
@@ -142,16 +142,21 @@
                 <div class="card">
                   <div class="card-head">Progreso del servicio</div>
                   <div class="card-body">
-                    <% const STEPS=[ {key:'pendiente', label:'Solicitud creada', sub:'Ticket generado'},
-                      {key:'en_revision', label:'Revisión inicial', sub:'1-4 hs laborables'}, {key:'en_coordinacion',
-                      label:'Coordinación de ingreso', sub:'12-24 hs'}, {key:'en_recepcion', label:'Recepción del
-                      dispositivo', sub:'15-30 min'}, {key:'en_diagnostico', label:'En diagnóstico', sub:'24-48 hs'},
-                      {key:'esperando_aprobacion', label:'Decisión del cliente', sub:'1-3 días'}, {key:'en_reparacion',
-                      label:'En reparación', sub:'1-5 días'}, {key:'listo_para_retiro', label:'Listo para retiro',
-                      sub:'Coordiná pago'}, {key:'completado', label:'Completado', sub:'Servicio finalizado'}, ]; const
-                      ORDER=STEPS.map(s=> s.key);
+                    <%
+                      const STEPS = [
+                        {key:'pendiente',             label:'Solicitud creada',        sub:'Ticket generado'},
+                        {key:'en_revision',           label:'Revisión inicial',         sub:'1-4 hs laborables'},
+                        {key:'en_coordinacion',       label:'Coordinación de ingreso',  sub:'12-24 hs'},
+                        {key:'en_recepcion',          label:'Recepción del dispositivo',sub:'15-30 min'},
+                        {key:'en_diagnostico',        label:'En diagnóstico',           sub:'24-48 hs'},
+                        {key:'esperando_aprobacion',  label:'Decisión del cliente',     sub:'1-3 días'},
+                        {key:'en_reparacion',         label:'En reparación',            sub:'1-5 días'},
+                        {key:'listo_para_retiro',     label:'Listo para retiro',        sub:'Coordiná pago'},
+                        {key:'completado',            label:'Completado',               sub:'Servicio finalizado'},
+                      ];
+                      const ORDER = STEPS.map(s => s.key);
                       const curIdx = ORDER.indexOf(request.status);
-                      %>
+                    %>
                       <div class="stepper">
                         <% STEPS.forEach((step, i)=> { %>
                           <% let cls='' ; if (i < curIdx) cls='done' ; else if (step.key===request.status) cls='active'
@@ -202,9 +207,10 @@
               </div>
   </main>
 
-  <script src="./js/request-detail.js">
+  <script>
     const reqId = <%= request.id %>;
   </script>
+  <script src="/js/request-detail.js"></script>
 </body>
 
 </html>
