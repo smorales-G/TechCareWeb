@@ -68,6 +68,8 @@ body {
   transition: color var(--transition), background var(--transition);
 }
 .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.nav-links a.btn { color: #fff !important; }
+.nav-links a.btn:hover { color: #fff !important; }
 
 /* ===================== BUTTONS ===================== */
 .btn {
@@ -222,7 +224,12 @@ select.form-control { cursor: pointer; appearance: none; background-image: url("
   margin-bottom: 0.75rem;
 }
 
-.services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem; }
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
 .service-card {
   background: var(--glass); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 2rem 1.5rem;
@@ -234,7 +241,12 @@ select.form-control { cursor: pointer; appearance: none; background-image: url("
 .service-card p { font-size: 0.85rem; color: var(--text-2); }
 
 /* ===================== HOW IT WORKS ===================== */
-.steps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; position: relative; }
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  position: relative;
+}
 .step-card {
   background: var(--glass); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 2rem 1.5rem;
@@ -262,6 +274,16 @@ select.form-control { cursor: pointer; appearance: none; background-image: url("
 .why-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
 .why-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
 .why-card p { font-size: 0.85rem; color: var(--text-2); }
+
+/* ===================== RESPONSIVE GRIDS ===================== */
+@media (max-width: 1024px) {
+  .services-grid { grid-template-columns: repeat(3, 1fr); }
+  .steps-grid    { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .services-grid { grid-template-columns: repeat(2, 1fr); }
+  .steps-grid    { grid-template-columns: 1fr; }
+}
 
 /* ===================== FOOTER ===================== */
 footer {
