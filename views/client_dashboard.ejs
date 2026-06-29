@@ -13,7 +13,40 @@
   <span class="nav-logo"><i class="fa-solid fa-bolt"></i> TechCare.mza</span>
   <div class="nav-right">
     <a href="/client/request/new" class="btn-new"><i class="fa-solid fa-plus"></i> Nueva Solicitud</a>
-    <a href="/logout" class="btn-nav">Salir</a>
+
+    <!-- Profile Avatar Dropdown -->
+    <div class="profile-menu" id="profileMenu">
+      <button class="profile-trigger" id="profileTrigger" onclick="toggleProfileMenu()" aria-haspopup="true" aria-expanded="false">
+        <div class="avatar-circle">
+          <%= user && user.name ? user.name.charAt(0).toUpperCase() : user && user.username ? user.username.charAt(0).toUpperCase() : 'U' %>
+        </div>
+        <span class="profile-name"><%= user && user.name ? user.name.split(' ')[0] : user && user.username ? user.username : 'Usuario' %></span>
+        <i class="fa-solid fa-chevron-down chevron-icon" id="profileChevron"></i>
+      </button>
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="dropdown-header">
+          <div class="dh-avatar">
+            <%= user && user.name ? user.name.charAt(0).toUpperCase() : user && user.username ? user.username.charAt(0).toUpperCase() : 'U' %>
+          </div>
+          <div>
+            <div class="dh-name"><%= user && user.name ? user.name : user && user.username ? user.username : 'Usuario' %></div>
+            <div class="dh-email"><%= user && user.email ? user.email : '' %></div>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <a href="/client/profile" class="dropdown-item">
+          <i class="fa-solid fa-user"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="dropdown-item">
+          <i class="fa-solid fa-gear"></i> Configuración
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="/logout" class="dropdown-item dropdown-item--danger">
+          <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+        </a>
+      </div>
+    </div>
+
   </div>
 </nav>
 
@@ -93,5 +126,26 @@
     <% }) %>
   </div>
 </main>
+
+<script>
+  function toggleProfileMenu() {
+    const dropdown = document.getElementById('profileDropdown');
+    const chevron  = document.getElementById('profileChevron');
+    const trigger  = document.getElementById('profileTrigger');
+    const isOpen   = dropdown.classList.contains('open');
+    dropdown.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    trigger.setAttribute('aria-expanded', !isOpen);
+  }
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('profileMenu');
+    if (!menu.contains(e.target)) {
+      document.getElementById('profileDropdown').classList.remove('open');
+      document.getElementById('profileChevron').style.transform = 'rotate(0deg)';
+      document.getElementById('profileTrigger').setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>
 </body>
 </html>
